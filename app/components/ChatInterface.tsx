@@ -11,7 +11,7 @@ const CHAR_INTERVAL = 25;
 const VISITOR_KEY = "cc_visitor";
 const USED_PROMPTS_KEY = "cc_used_prompts";
 
-const FIRST_PROMPT = "who are you?";
+const FIRST_PROMPT = "who are you? keep it short";
 const PROMPTS = [
   "what are you building?",
   "why'd you quit your job?",
@@ -70,7 +70,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const submitRef = useRef<(text: string) => Promise<void>>(async () => {});
+  const submitRef = useRef<(text: string) => Promise<void>>(async () => { });
   const audioCtxRef = useRef<AudioContext | null>(null);
   const rafRef = useRef<number>(0);
   const micStateRef = useRef<MicState>("idle");
@@ -91,11 +91,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     try {
       const saved = localStorage.getItem(VISITOR_KEY);
       if (saved) setVisitorName(JSON.parse(saved).name ?? null);
-    } catch {}
+    } catch { }
     try {
       const used = new Set<string>(JSON.parse(localStorage.getItem(USED_PROMPTS_KEY) || "[]"));
       setSuggestedPrompt(pickUnusedPrompt(used));
-    } catch {}
+    } catch { }
   }, []);
 
   // Load session from localStorage
@@ -104,7 +104,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     try {
       const saved = localStorage.getItem(`session:${initialSessionId}`);
       if (saved) setMessages(JSON.parse(saved));
-    } catch {}
+    } catch { }
   }, [initialSessionId]);
 
   // Save to localStorage when streaming completes
@@ -198,7 +198,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         if (visitorMatch) {
           const name = visitorMatch[1];
           setVisitorName(name);
-          try { localStorage.setItem(VISITOR_KEY, JSON.stringify({ name })); } catch {}
+          try { localStorage.setItem(VISITOR_KEY, JSON.stringify({ name })); } catch { }
           chunk = chunk.replace(visitorMatch[0], "");
         }
         for (const ch of chunk) { revealQueueRef.current.push(ch); }
@@ -323,7 +323,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       used.add(sent);
       localStorage.setItem(USED_PROMPTS_KEY, JSON.stringify([...used]));
       setSuggestedPrompt(pickUnusedPrompt(used));
-    } catch {}
+    } catch { }
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
