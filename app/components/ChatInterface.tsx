@@ -412,7 +412,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   const guestbookLink = (
     <Link
-      href="/guestbook"
+      href={sessionId ? `/guestbook?from=/chat/${sessionId}` : "/guestbook"}
       className="absolute top-6 right-6 md:right-10 z-20 font-sans text-[13px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
       guest book
