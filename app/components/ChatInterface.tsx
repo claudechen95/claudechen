@@ -62,7 +62,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
   const [showCal, setShowCal] = useState(false);
   const [visitorName, setVisitorName] = useState<string | null>(null);
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [pairPhotos, setPairPhotos] = useState<Record<number, string>>({});
   const [guestbookEntryId, setGuestbookEntryId] = useState<string | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
 
@@ -118,13 +118,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, photoUrl, guestbookEntryId]);
+  }, [messages, pairPhotos, guestbookEntryId]);
 
   const submit = async (text: string) => {
     const q = text.trim();
     if (!q || streamingRef.current) return;
     setShowCal(false);
-    setPhotoUrl(null);
 
     // Generate session ID on first message
     let currentSessionId = sessionIdRef.current;
@@ -136,6 +135,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     }
 
     const history: Message[] = [...messages, { role: "user", content: q }];
+    const pairIndex = Math.floor(history.length / 2);
     setMessages([...history, { role: "assistant", content: "" }]);
     setInput("");
     setStreaming(true);
@@ -190,7 +190,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         }
         const photoMatch = chunk.match(/\x00PHOTO:([^\x00]+)\x00/);
         if (photoMatch) {
-          setPhotoUrl(`/api/photos/${photoMatch[1]}`);
+          setPairPhotos((prev) => ({ ...prev, [pairIndex]: `/api/photos/${photoMatch[1]}` }));
           chunk = chunk.replace(photoMatch[0], "");
         }
         const visitorMatch = chunk.match(/\x00VISITOR:([^\x00]+)\x00/);
@@ -420,11 +420,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                 <p className="font-sans text-[22px] leading-[1.75] text-[#1B1B19] whitespace-pre-wrap">
                   {renderWithLinks(pair.a)}
                 </p>
+                {pairPhotos[i] && (
+                  <img src={pairPhotos[i]} alt="" className="mt-6 w-full rounded-lg object-cover max-h-[400px]" />
+                )}
               </div>
             ))}
-            {photoUrl && (
-              <img src={photoUrl} alt="" className="w-full rounded-lg object-cover max-h-[400px]" />
-            )}
             {guestbookEntryId && (
               <PhotoUploadButton
                 entryId={guestbookEntryId}
