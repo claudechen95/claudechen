@@ -1,0 +1,14 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e23]:
+      - paragraph [ref=e24]: — Where did you grow up?
+      - paragraph [ref=e25]: The bio I have access to is still a work in
+    - contentinfo [ref=e27]:
+      - generic [ref=e29]:
+        - button "Record" [disabled] [ref=e30]:
+          - img [ref=e31]
+        - textbox "Ask anything" [ref=e34]
+        - button "Send" [disabled] [ref=e35]: →
+  - button "Open Next.js Dev Tools" [ref=e16] [cursor=pointer]:
+    - img [ref=e17]
+  - alert [ref=e20]

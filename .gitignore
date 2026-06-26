@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# next.js
+.next/
+out/
+
+# vercel
+.vercel
+
+# env files
+.env*.local
+
+# OS
+.DS_Store
+
+# dev tooling artifacts
+.playwright-mcp/
+tsconfig.tsbuildinfo
+
+# private assets (served via API)
+private/
