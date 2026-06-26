@@ -11,7 +11,7 @@ const CHAR_INTERVAL = 25;
 const VISITOR_KEY = "cc_visitor";
 const USED_PROMPTS_KEY = "cc_used_prompts";
 
-const FIRST_PROMPT = "Hello Claude";
+const FIRST_PROMPT = "Hello Claude, describe yourself in 10 words or less";
 const PROMPTS = [
   "what are you building?",
   "why'd you quit your job?",
