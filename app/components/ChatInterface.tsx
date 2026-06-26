@@ -18,7 +18,6 @@ const PROMPTS = [
   "what did you do at Amazon / Coupang?",
   "why entrepreneurship?",
   "tell me something about growing up",
-  "where have you traveled?",
   "what are your hobbies?",
   "show me a photo",
   "how can I reach you?",
