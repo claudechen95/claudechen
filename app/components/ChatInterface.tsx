@@ -32,24 +32,47 @@ function pickUnusedPrompt(exclude: Set<string>): string | null {
   return unused[Math.floor(Math.random() * unused.length)];
 }
 
+const MD_LINK_RE = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
 const URL_RE = /(https?:\/\/[^\s]+|(?<![/@\w])[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/g;
 
 function renderWithLinks(text: string) {
-  const parts = text.split(URL_RE);
-  return parts.map((part, i) => {
-    if (!part.match(/^https?:\/\//) && !part.match(/^[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+\.[a-zA-Z]{2,}/)) return part;
-    const href = part.startsWith("http") ? part : `https://${part}`;
-    const display = part.replace(/[.,;!?]+$/, "");
-    const trailing = part.slice(display.length);
-    return (
-      <span key={i}>
-        <a href={href.replace(/[.,;!?]+$/, "")} target="_blank" rel="noopener noreferrer"
+  // Split on markdown links [label](url) first, then handle bare URLs in text segments
+  const segments: Array<{ type: "text" | "mdlink"; text: string; href?: string }> = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  MD_LINK_RE.lastIndex = 0;
+  while ((m = MD_LINK_RE.exec(text)) !== null) {
+    if (m.index > last) segments.push({ type: "text", text: text.slice(last, m.index) });
+    segments.push({ type: "mdlink", text: m[1], href: m[2] });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) segments.push({ type: "text", text: text.slice(last) });
+
+  return segments.flatMap((seg, si) => {
+    if (seg.type === "mdlink") {
+      return (
+        <a key={si} href={seg.href} target="_blank" rel="noopener noreferrer"
           className="underline underline-offset-2 hover:opacity-60 transition-opacity">
-          {display}
+          {seg.text}
         </a>
-        {trailing}
-      </span>
-    );
+      );
+    }
+    const parts = seg.text.split(URL_RE);
+    return parts.map((part, i) => {
+      if (!part.match(/^https?:\/\//) && !part.match(/^[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+\.[a-zA-Z]{2,}/)) return part;
+      const href = part.startsWith("http") ? part : `https://${part}`;
+      const display = part.replace(/[.,;!?]+$/, "");
+      const trailing = part.slice(display.length);
+      return (
+        <span key={`${si}-${i}`}>
+          <a href={href.replace(/[.,;!?]+$/, "")} target="_blank" rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:opacity-60 transition-opacity">
+            {display}
+          </a>
+          {trailing}
+        </span>
+      );
+    });
   });
 }
 
