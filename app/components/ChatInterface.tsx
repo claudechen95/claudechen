@@ -413,7 +413,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const guestbookLink = (
     <Link
       href="/guestbook"
-      className="absolute top-6 right-10 font-sans text-[13px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
+      className="absolute top-6 right-6 md:right-10 z-20 font-sans text-[13px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
       guest book
     </Link>
@@ -422,7 +422,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   // Empty state: input centered in viewport
   if (pairs.length === 0) {
     return (
-      <div className="relative flex h-screen items-center justify-center bg-[#F8F7F3] px-10">
+      <div className="relative flex h-[100dvh] items-center justify-center bg-[#F8F7F3] px-6 md:px-10">
         {guestbookLink}
         <div className="w-full max-w-full md:max-w-[75vw]">{inputRow}</div>
       </div>
@@ -430,53 +430,61 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-[#F8F7F3] py-16">
-      <div className="w-full max-w-full md:max-w-[75vw] px-10">
-        {guestbookLink}
-        <div className="relative mb-14">
-          <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
+    <div className="relative flex flex-col h-[100dvh] bg-[#F8F7F3]">
+      {guestbookLink}
 
-          <div ref={scrollRef} className="max-h-[33vh] overflow-y-auto space-y-14">
-            {pairs.map((pair, i) => (
-              <div key={i}>
-                {!pair.q.startsWith("\x00") && (
-                  <p className="font-sans text-[14px] text-[#9C9890] italic mb-5">— {pair.q}</p>
-                )}
-                <p className="font-sans text-[22px] leading-[1.75] text-[#1B1B19] whitespace-pre-wrap">
-                  {renderWithLinks(pair.a)}
-                </p>
-                {pairPhotos[i] && (
-                  <img src={pairPhotos[i]} alt="" className="mt-6 w-full rounded-lg object-cover max-h-[400px]" />
-                )}
-              </div>
-            ))}
-            {guestbookEntryId && (
-              <PhotoUploadButton
-                entryId={guestbookEntryId}
-                onUploaded={() => {
-                  setGuestbookEntryId(null);
-                  setMessages((prev) => [
-                    ...prev,
-                    { role: "user", content: "\x00photo\x00" },
-                    { role: "assistant", content: "got it. photo's in." },
-                  ]);
-                }}
-              />
-            )}
+      {/* Scrollable messages */}
+      <div className="relative flex-1 overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
+        <div ref={scrollRef} className="h-full overflow-y-auto">
+          <div className="w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 pt-16 pb-4">
+            <div className="space-y-10 md:space-y-14">
+              {pairs.map((pair, i) => (
+                <div key={i}>
+                  {!pair.q.startsWith("\x00") && (
+                    <p className="font-sans text-[14px] text-[#9C9890] italic mb-5">— {pair.q}</p>
+                  )}
+                  <p className="font-sans text-[18px] md:text-[22px] leading-[1.75] text-[#1B1B19] whitespace-pre-wrap">
+                    {renderWithLinks(pair.a)}
+                  </p>
+                  {pairPhotos[i] && (
+                    <img src={pairPhotos[i]} alt="" className="mt-6 w-full rounded-lg object-cover max-h-[400px]" />
+                  )}
+                </div>
+              ))}
+              {guestbookEntryId && (
+                <PhotoUploadButton
+                  entryId={guestbookEntryId}
+                  onUploaded={() => {
+                    setGuestbookEntryId(null);
+                    setMessages((prev) => [
+                      ...prev,
+                      { role: "user", content: "\x00photo\x00" },
+                      { role: "assistant", content: "got it. photo's in." },
+                    ]);
+                  }}
+                />
+              )}
+              {showCal && (
+                <iframe
+                  src="https://cal.com/claudechen/30min?embed=true&theme=light&overlayCalendar=true"
+                  width="100%"
+                  height="600"
+                  frameBorder="0"
+                  className="rounded-lg"
+                />
+              )}
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Sticky input */}
+      <div
+        className="shrink-0 w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 py-5"
+        style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
+      >
         {inputRow}
-        {showCal && (
-          <div className="mt-10">
-            <iframe
-              src="https://cal.com/claudechen/30min?embed=true&theme=light&overlayCalendar=true"
-              width="100%"
-              height="600"
-              frameBorder="0"
-              className="rounded-lg"
-            />
-          </div>
-        )}
       </div>
     </div>
   );

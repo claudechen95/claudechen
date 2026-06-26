@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { PostHogProvider } from "./components/PostHogProvider";
@@ -16,9 +16,29 @@ const dmSans = DM_Sans({
   weight: ["300", "400", "500"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-visual",
+};
+
 export const metadata: Metadata = {
   title: "Claude Chen",
   description: "Ask me anything.",
+  openGraph: {
+    title: "Claude Chen",
+    description: "Ask me anything.",
+    url: "https://claudechen.me",
+    siteName: "Claude Chen",
+    images: [{ url: "https://claudechen.me/preview.png", width: 754, height: 1190 }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Claude Chen",
+    description: "Ask me anything.",
+    images: ["https://claudechen.me/preview.png"],
+  },
 };
 
 export default function RootLayout({
