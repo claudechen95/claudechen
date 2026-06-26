@@ -8,8 +8,6 @@ type Message = { role: "user" | "assistant"; content: string };
 type MicState = "idle" | "listening" | "transcribing";
 
 const CHAR_INTERVAL = 25;
-const VISITOR_KEY = "cc_visitor";
-const USED_PROMPTS_KEY = "cc_used_prompts";
 
 const FIRST_PROMPT = "Hello Claude, describe yourself in 10 words or less";
 const PROMPTS = [
@@ -19,7 +17,7 @@ const PROMPTS = [
   "why entrepreneurship?",
   "tell me something about growing up",
   "what are your hobbies?",
-  "show me a photo",
+  "are you secretly ugly? Prove it",
   "how can I reach you?",
   "schedule a meeting",
   "sign the guest book",
@@ -108,16 +106,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => { streamingRef.current = streaming; }, [streaming]);
   useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
-  // Load visitor name and pick initial suggested prompt from localStorage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(VISITOR_KEY);
-      if (saved) setVisitorName(JSON.parse(saved).name ?? null);
-    } catch { }
-    try {
-      const used = new Set<string>(JSON.parse(localStorage.getItem(USED_PROMPTS_KEY) || "[]"));
-      setSuggestedPrompt(pickUnusedPrompt(used));
-    } catch { }
+    setSuggestedPrompt(pickUnusedPrompt(new Set()));
   }, []);
 
   // Load session from localStorage
@@ -220,7 +210,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         if (visitorMatch) {
           const name = visitorMatch[1];
           setVisitorName(name);
-          try { localStorage.setItem(VISITOR_KEY, JSON.stringify({ name })); } catch { }
           chunk = chunk.replace(visitorMatch[0], "");
         }
         for (const ch of chunk) { revealQueueRef.current.push(ch); }
@@ -339,13 +328,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     startRecording(false);
   };
 
+  const usedPromptsRef = useRef(new Set<string>());
   const advancePrompt = (sent: string) => {
-    try {
-      const used = new Set<string>(JSON.parse(localStorage.getItem(USED_PROMPTS_KEY) || "[]"));
-      used.add(sent);
-      localStorage.setItem(USED_PROMPTS_KEY, JSON.stringify([...used]));
-      setSuggestedPrompt(pickUnusedPrompt(used));
-    } catch { }
+    usedPromptsRef.current.add(sent);
+    setSuggestedPrompt(pickUnusedPrompt(usedPromptsRef.current));
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
