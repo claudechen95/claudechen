@@ -1,5 +1,5 @@
 import { Redis } from "@upstash/redis";
-import Link from "next/link";
+import BackButton from "./BackButton";
 
 const kv = new Redis({
   url: process.env.personalwebsite_KV_REST_API_URL!,
@@ -24,9 +24,7 @@ export default async function GuestbookPage() {
       <div className="w-full max-w-[680px] mx-auto">
         <div className="flex items-baseline justify-between mb-16">
           <h1 className="font-sans text-[14px] text-[#9C9890]">guest book</h1>
-          <Link href="/" className="font-sans text-[14px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors">
-            ← back
-          </Link>
+          <BackButton />
         </div>
 
         {entries.length === 0 ? (

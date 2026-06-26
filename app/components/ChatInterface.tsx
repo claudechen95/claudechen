@@ -366,12 +366,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   }
 
   const inputRow = (
-    <div className="flex items-center gap-5">
+    <div className="flex items-end gap-5">
       <button
         onClick={toggleMic}
         disabled={streaming || micState === "transcribing"}
         aria-label={micState === "listening" ? "Stop" : "Record"}
-        className="shrink-0 disabled:opacity-30 transition-opacity"
+        className="shrink-0 disabled:opacity-30 transition-opacity pb-0.5"
       >
         {micState === "listening" ? (
           <span className="inline-block w-3 h-3 rounded-full bg-red-400 animate-pulse" />
@@ -381,15 +381,31 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           <MicIcon className="text-[#C8C4BE] hover:text-[#9C9890] transition-colors" />
         )}
       </button>
-      <textarea
-        ref={textareaRef}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={onKeyDown}
-        placeholder={suggestedPrompt ?? "Ask anything"}
-        rows={1}
-        className="flex-1 bg-transparent font-sans text-[18px] text-[#1B1B19] placeholder-[#C8C4BE] resize-none outline-none leading-relaxed caret-transparent"
-      />
+      <div className="relative flex-1">
+        {!input && (
+          <div
+            onClick={() => textareaRef.current?.focus()}
+            className="font-sans text-[18px] text-[#C8C4BE] leading-relaxed break-words cursor-text"
+          >
+            {suggestedPrompt ?? "Ask anything"}
+          </div>
+        )}
+        <textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            e.target.style.height = "auto";
+            e.target.style.height = e.target.scrollHeight + "px";
+          }}
+          onKeyDown={onKeyDown}
+          rows={1}
+          className={[
+            "bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed caret-transparent",
+            input ? "w-full" : "absolute inset-0 opacity-0 cursor-text",
+          ].join(" ")}
+        />
+      </div>
       <button
         onClick={() => {
           if (!input.trim() && suggestedPrompt) {
@@ -401,7 +417,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         }}
         disabled={(!input.trim() && !suggestedPrompt) || streaming}
         aria-label="Send"
-        className="font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0"
+        className="font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0 pb-0.5"
       >
         →
       </button>
@@ -422,14 +438,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     return (
       <div className="relative flex h-screen items-center justify-center bg-[#F8F7F3] px-10">
         {guestbookLink}
-        <div className="w-full max-w-[680px]">{inputRow}</div>
+        <div className="w-full max-w-[75vw]">{inputRow}</div>
       </div>
     );
   }
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[#F8F7F3] py-16">
-      <div className="w-full max-w-[680px] px-10">
+      <div className="w-full max-w-[75vw] px-10">
         {guestbookLink}
         <div className="relative mb-14">
           <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
