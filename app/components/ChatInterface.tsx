@@ -438,14 +438,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     return (
       <div className="relative flex h-screen items-center justify-center bg-[#F8F7F3] px-10">
         {guestbookLink}
-        <div className="w-full max-w-[75vw]">{inputRow}</div>
+        <div className="w-full max-w-full md:max-w-[75vw]">{inputRow}</div>
       </div>
     );
   }
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[#F8F7F3] py-16">
-      <div className="w-full max-w-[75vw] px-10">
+      <div className="w-full max-w-full md:max-w-[75vw] px-10">
         {guestbookLink}
         <div className="relative mb-14">
           <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
