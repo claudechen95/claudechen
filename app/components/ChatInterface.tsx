@@ -513,7 +513,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   </p>
                   {pairPhotos[i] && (
                     <a href={pairPhotos[i]} target="_blank" rel="noopener noreferrer" className="block mt-6">
-                      <img src={pairPhotos[i]} alt="" className="w-full rounded-lg" />
+                      <img src={pairPhotos[i]} alt="" className="w-full md:w-auto md:max-h-[220px] rounded-lg" />
                     </a>
                   )}
                   {calPairIndex === i && (
