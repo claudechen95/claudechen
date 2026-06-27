@@ -398,12 +398,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   }
 
   const inputRow = (
-    <div className="flex items-end gap-5">
+    <div className="flex items-center gap-5">
       <button
         onClick={toggleMic}
         disabled={streaming || micState === "transcribing"}
         aria-label={micState === "listening" ? "Stop" : "Record"}
-        className="shrink-0 disabled:opacity-30 transition-opacity pb-0.5"
+        className="shrink-0 disabled:opacity-30 transition-opacity"
       >
         {micState === "listening" ? (
           <span className="inline-block w-3 h-3 rounded-full bg-red-400 animate-pulse" />
@@ -437,7 +437,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           onKeyDown={onKeyDown}
           rows={1}
           className={[
-            "bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed md:caret-transparent",
+            "bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0 md:caret-transparent",
             input ? "w-full" : "absolute inset-0 opacity-0 cursor-text",
           ].join(" ")}
         />
@@ -452,7 +452,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         }}
         disabled={(!input.trim() && !suggestedPrompt) || streaming || promptSending}
         aria-label="Send"
-        className="font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0 pb-0.5"
+        className="font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0"
       >
         →
       </button>
