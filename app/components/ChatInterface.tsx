@@ -463,7 +463,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const guestbookLink = (
     <Link
       href={guestbookHref}
-      onClick={() => { document.documentElement.dataset.flip = "forward"; setTimeout(() => delete document.documentElement.dataset.flip, 700); }}
+      onClick={() => {}}
       className="absolute top-6 right-6 md:right-10 z-20 font-sans text-[13px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
       guest book

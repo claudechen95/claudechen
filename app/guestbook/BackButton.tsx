@@ -10,8 +10,6 @@ function BackButtonInner() {
   const from = searchParams.get("from");
 
   const handleBack = () => {
-    document.documentElement.dataset.flip = "back";
-    setTimeout(() => delete document.documentElement.dataset.flip, 700);
     if (from) router.push(from);
     else router.back();
   };

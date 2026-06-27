@@ -12,38 +12,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Page transitions (direction-aware slide+fade) ── */
-
-/* Forward: chat → guestbook */
-@keyframes slide-out-left {
-  from { transform: translateX(0);    opacity: 1; }
-  to   { transform: translateX(-28px); opacity: 0; }
-}
-@keyframes slide-in-right {
-  from { transform: translateX(28px); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
-}
-
-/* Back: guestbook → chat */
-@keyframes slide-out-right {
-  from { transform: translateX(0);    opacity: 1; }
-  to   { transform: translateX(28px); opacity: 0; }
-}
-@keyframes slide-in-left {
-  from { transform: translateX(-28px); opacity: 0; }
-  to   { transform: translateX(0);    opacity: 1; }
-}
-
-html[data-flip="forward"]::view-transition-old(root) {
-  animation: slide-out-left  0.28s ease forwards;
-}
-html[data-flip="forward"]::view-transition-new(root) {
-  animation: slide-in-right  0.28s ease forwards;
-}
-
-html[data-flip="back"]::view-transition-old(root) {
-  animation: slide-out-right 0.28s ease forwards;
-}
-html[data-flip="back"]::view-transition-new(root) {
-  animation: slide-in-left   0.28s ease forwards;
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
 }
