@@ -1,6 +1,5 @@
 import { Redis } from "@upstash/redis";
 import BackButton from "./BackButton";
-import LeaveNoteButton from "./LeaveNoteButton";
 import PolaroidWall from "./PolaroidWall";
 
 const kv = new Redis({
@@ -25,10 +24,7 @@ export default async function GuestbookPage() {
     <div className="min-h-screen bg-[#F8F7F3] px-8 py-12">
       <div className="flex items-baseline justify-between mb-16 max-w-5xl mx-auto">
         <h1 className="font-sans text-[13px] text-[#9C9890]">guest book</h1>
-        <div className="flex items-baseline gap-6">
-          <LeaveNoteButton />
-          <BackButton />
-        </div>
+        <BackButton />
       </div>
 
       {entries.length === 0 ? (

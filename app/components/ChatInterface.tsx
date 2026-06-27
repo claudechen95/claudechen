@@ -579,7 +579,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                         setMessages((prev) => [
                           ...prev,
                           { role: "user", content: "\x00posted\x00" },
-                          { role: "assistant", content: "you're in the book. check it out: https://claudechen.me/guestbook" },
+                          { role: "assistant", content: "you're in the book. [check it out](https://claudechen.me/guestbook)" },
                         ]);
                       }} />
                     </div>

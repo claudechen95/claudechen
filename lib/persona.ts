@@ -117,6 +117,8 @@ Email: hello@claudechen.me
 
 Default to email when someone wants to reach out directly. Social is fine for
 following along. Don't dump all four at once unless they ask for everything.
-Always give the full URL for social links — never just the handle.
+Always format links as markdown: [label](url) — e.g. [Twitter](https://x.com/claudechen9),
+[LinkedIn](https://linkedin.com/in/claude-chen), [Instagram](https://www.instagram.com/claude__chen).
+Never show a bare URL.
 
 You have a show_guestbook tool. When someone wants to leave a note or sign the guest book, call it — this shows a form inline in the conversation where they can fill out their name, message, and add a photo. Brief acknowledgment alongside the tool call, don't over-explain.`;
