@@ -86,7 +86,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [pairPhotos, setPairPhotos] = useState<Record<number, string>>({});
   const [calPairIndex, setCalPairIndex] = useState<number | null>(null);
-  const [guestbookEntryId, setGuestbookEntryId] = useState<string | null>(null);
+  const [guestbookPending, setGuestbookPending] = useState<{ name: string; message: string } | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
 
@@ -193,7 +193,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, pairPhotos, guestbookEntryId]);
+  }, [messages, pairPhotos, guestbookPending]);
 
   const submit = async (text: string) => {
     const q = text.trim();
@@ -258,10 +258,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           chunk = chunk.replace("\x00SHOW_CAL\x00", "");
         }
         chunk = chunk.replace("\x00SHOW_GUESTBOOK\x00", "");
-        const guestbookIdMatch = chunk.match(/\x00GUESTBOOK_ID:([^\x00]+)\x00/);
-        if (guestbookIdMatch) {
-          chunk = chunk.replace(guestbookIdMatch[0], "");
-          setGuestbookEntryId(guestbookIdMatch[1]);
+        const guestbookPendingMatch = chunk.match(/\x00GUESTBOOK_PENDING:([^\x00]+)\x00/);
+        if (guestbookPendingMatch) {
+          chunk = chunk.replace(guestbookPendingMatch[0], "");
+          try { setGuestbookPending(JSON.parse(guestbookPendingMatch[1])); } catch { }
         }
         const photoMatch = chunk.match(/\x00PHOTO:([^\x00]+)\x00/);
         if (photoMatch) {
@@ -426,7 +426,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     pairs.push({ q: messages[i].content, a: messages[i + 1]?.content ?? "" });
   }
 
-  const inputLocked = !!guestbookEntryId;
+  const inputLocked = !!guestbookPending;
 
   const inputRow = (
     <div className="flex items-center gap-5">
@@ -578,15 +578,15 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   )}
                 </div>
               ))}
-              {guestbookEntryId && (
+              {guestbookPending && (
                 <PhotoUploadButton
-                  entryId={guestbookEntryId}
+                  pending={guestbookPending}
                   onUploaded={() => {
-                    setGuestbookEntryId(null);
+                    setGuestbookPending(null);
                     setMessages((prev) => [
                       ...prev,
                       { role: "user", content: "\x00photo\x00" },
-                      { role: "assistant", content: "got it. photo's in." },
+                      { role: "assistant", content: "got it. you're in the book." },
                     ]);
                   }}
                 />
@@ -613,7 +613,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   );
 }
 
-function PhotoUploadButton({ entryId, onUploaded }: { entryId: string; onUploaded: () => void }) {
+function PhotoUploadButton({ pending, onUploaded }: { pending: { name: string; message: string }; onUploaded: () => void }) {
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -625,9 +625,10 @@ function PhotoUploadButton({ entryId, onUploaded }: { entryId: string; onUploade
     setUploading(true);
     try {
       const fd = new FormData();
-      fd.append("id", entryId);
+      fd.append("name", pending.name);
+      fd.append("message", pending.message);
       fd.append("image", file);
-      await fetch("/api/guestbook", { method: "PATCH", body: fd });
+      await fetch("/api/guestbook", { method: "POST", body: fd });
       onUploaded();
     } finally {
       setUploading(false);

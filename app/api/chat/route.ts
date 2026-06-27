@@ -55,7 +55,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: "save_guestbook_entry",
     description:
-      "Save the visitor's guest book entry after collecting their name and message through conversation. After calling this, the tool will return the saved entry id. Then tell the visitor their note is saved in your voice, and tell them to drop any photo below to post it — the cafe you're at, whatever, doesn't matter.",
+      "Stage the visitor's guest book entry after collecting their name and message. This does NOT save the entry yet — a photo is required to complete it. After calling this, tell the visitor their note is ready and to drop any photo below to post it — selfie, whatever, doesn't matter. The entry won't be saved until they do.",
     input_schema: {
       type: "object" as const,
       properties: {
@@ -148,17 +148,11 @@ export async function POST(req: Request) {
               input.name &&
               input.message
             ) {
-              const entry = {
-                id: Math.random().toString(36).slice(2, 10),
-                name: input.name.trim(),
-                message: input.message.trim(),
-                date: new Date().toISOString(),
-              };
-              await kv.lpush("guestbook", entry);
+              const data = JSON.stringify({ name: input.name.trim(), message: input.message.trim() });
               controller.enqueue(
-                encoder.encode(`\x00GUESTBOOK_ID:${entry.id}\x00`)
+                encoder.encode(`\x00GUESTBOOK_PENDING:${data}\x00`)
               );
-              result = `Saved. Entry id: ${entry.id}`;
+              result = "Ready. Waiting for photo.";
             }
 
             toolResults.push({

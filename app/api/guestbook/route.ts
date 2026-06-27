@@ -19,19 +19,35 @@ export async function GET() {
   return Response.json(entries);
 }
 
-// Bot calls this after collecting name + message through conversation
+// Called when visitor submits name + message + photo together
 export async function POST(req: Request) {
-  const { name, message } = await req.json();
+  const formData = await req.formData();
+  const name = formData.get("name") as string;
+  const message = formData.get("message") as string;
+  const file = formData.get("image") as File | null;
 
   if (!name?.trim() || !message?.trim()) {
     return Response.json({ error: "Name and message required" }, { status: 400 });
   }
+  if (!file || file.size === 0) {
+    return Response.json({ error: "Photo required" }, { status: 400 });
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    return Response.json({ error: "Image too large (max 5MB)" }, { status: 400 });
+  }
+
+  const blob = await put(`guestbook/${Date.now()}-${file.name}`, file, {
+    access: "private",
+    token: process.env.BLOB_READ_WRITE_TOKEN,
+  });
+  const imageUrl = `/api/guestbook/image?p=${encodeURIComponent(blob.url)}`;
 
   const entry: Entry = {
     id: Math.random().toString(36).slice(2, 10),
     name: name.trim(),
     message: message.trim(),
     date: new Date().toISOString(),
+    imageUrl,
   };
 
   await kv.lpush("guestbook", entry);
