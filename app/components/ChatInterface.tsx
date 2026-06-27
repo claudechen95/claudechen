@@ -465,7 +465,13 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const guestbookLink = (
     <Link
       href={guestbookHref}
-      onClick={() => {}}
+      onClick={(e) => {
+        // View Transitions API causes a visible freeze on mobile — skip it on touch devices
+        if (!window.matchMedia("(hover: hover)").matches) {
+          e.preventDefault();
+          window.location.href = guestbookHref;
+        }
+      }}
       className="absolute top-6 right-6 md:right-10 z-20 font-sans text-[13px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
       guest book

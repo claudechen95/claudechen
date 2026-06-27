@@ -10,6 +10,10 @@ function BackButtonInner() {
   const from = searchParams.get("from");
 
   const handleBack = () => {
+    if (!window.matchMedia("(hover: hover)").matches) {
+      window.location.href = from ?? "/";
+      return;
+    }
     if (from) router.push(from);
     else router.back();
   };
