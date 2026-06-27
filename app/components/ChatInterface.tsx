@@ -82,7 +82,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [streaming, setStreaming] = useState(false);
   const [micState, setMicState] = useState<MicState>("idle");
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
-  const [showCal, setShowCal] = useState(false);
+
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [pairPhotos, setPairPhotos] = useState<Record<number, string>>({});
   const [guestbookEntryId, setGuestbookEntryId] = useState<string | null>(null);
@@ -170,7 +170,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const submit = async (text: string) => {
     const q = text.trim();
     if (!q || streamingRef.current) return;
-    setShowCal(false);
+
 
     // Generate session ID on first message
     let currentSessionId = sessionIdRef.current;
@@ -225,10 +225,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         if (done) break;
 
         let chunk = decoder.decode(value, { stream: true });
-        if (chunk.includes("\x00SHOW_CAL\x00")) {
-          setShowCal(true);
-          chunk = chunk.replace("\x00SHOW_CAL\x00", "");
-        }
+        chunk = chunk.replace("\x00SHOW_CAL\x00", "");
         chunk = chunk.replace("\x00SHOW_GUESTBOOK\x00", "");
         const guestbookIdMatch = chunk.match(/\x00GUESTBOOK_ID:([^\x00]+)\x00/);
         if (guestbookIdMatch) {
@@ -530,15 +527,13 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   }}
                 />
               )}
-              {showCal && (
-                <iframe
-                  src="https://cal.com/claudechen/30min?embed=true&theme=light&overlayCalendar=true"
-                  width="100%"
-                  height="600"
-                  frameBorder="0"
-                  className="rounded-lg"
-                />
-              )}
+              <iframe
+                src="https://cal.com/claudechen/30min?embed=true&theme=light&overlayCalendar=true"
+                width="100%"
+                height="600"
+                frameBorder="0"
+                className="rounded-lg"
+              />
             </div>
           </div>
       </div>
