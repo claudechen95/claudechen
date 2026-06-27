@@ -14,14 +14,14 @@ function LeaveNoteButtonInner() {
       href={href}
       className="font-sans text-[14px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
-      leave a note →
+      leave a note
     </a>
   );
 }
 
 export default function LeaveNoteButton() {
   return (
-    <Suspense fallback={<span className="font-sans text-[14px] text-[#C8C4BE]">leave a note →</span>}>
+    <Suspense fallback={<span className="font-sans text-[14px] text-[#C8C4BE]">leave a note</span>}>
       <LeaveNoteButtonInner />
     </Suspense>
   );
