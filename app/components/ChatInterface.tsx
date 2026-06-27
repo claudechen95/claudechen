@@ -107,6 +107,17 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => { streamingRef.current = streaming; }, [streaming]);
   useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
+  // Fix iOS Safari first-tap keyboard bug: 100dvh doesn't update on first keyboard open.
+  // Track visualViewport.height directly and expose it as --vph for container heights.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const update = () => document.documentElement.style.setProperty("--vph", `${vv.height}px`);
+    update();
+    vv.addEventListener("resize", update);
+    return () => vv.removeEventListener("resize", update);
+  }, []);
+
   useEffect(() => {
     try {
       const used = new Set<string>(JSON.parse(sessionStorage.getItem("cc_used_prompts") || "[]"));
@@ -449,7 +460,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   // Empty state: input centered in viewport
   if (pairs.length === 0) {
     return (
-      <div className="relative flex h-[100dvh] items-center justify-center bg-[#F8F7F3] px-6 md:px-10">
+      <div className="relative flex items-center justify-center bg-[#F8F7F3] px-6 md:px-10" style={{ height: "var(--vph, 100dvh)" }}>
         {guestbookLink}
         <div className="w-full max-w-full md:max-w-[75vw]">{inputRow}</div>
       </div>
@@ -457,7 +468,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   }
 
   return (
-    <div className="relative flex flex-col h-[100dvh] bg-[#F8F7F3]">
+    <div className="relative flex flex-col bg-[#F8F7F3]" style={{ height: "var(--vph, 100dvh)" }}>
       {guestbookLink}
       <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
 
