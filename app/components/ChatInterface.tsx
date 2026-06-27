@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { usePostHog } from "posthog-js/react";
+import { NewEntryCard } from "@/app/guestbook/PolaroidWall";
 
 type Message = { role: "user" | "assistant"; content: string };
 type MicState = "idle" | "listening" | "transcribing";
@@ -86,7 +87,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [pairPhotos, setPairPhotos] = useState<Record<number, string>>({});
   const [calPairIndex, setCalPairIndex] = useState<number | null>(null);
-  const [guestbookPending, setGuestbookPending] = useState<{ name: string; message: string } | null>(null);
+  const [guestbookPairIndex, setGuestbookPairIndex] = useState<number | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
 
@@ -165,6 +166,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       if (savedPhotos) setPairPhotos(JSON.parse(savedPhotos));
       const savedCal = localStorage.getItem(`cal:${initialSessionId}`);
       if (savedCal !== null) setCalPairIndex(JSON.parse(savedCal));
+      const savedGuestbook = localStorage.getItem(`guestbook:${initialSessionId}`);
+      if (savedGuestbook !== null) setGuestbookPairIndex(JSON.parse(savedGuestbook));
     } catch { }
     setSessionLoaded(true);
   }, [initialSessionId]);
@@ -186,14 +189,15 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       localStorage.setItem(`session:${id}`, JSON.stringify(messages));
       localStorage.setItem(`photos:${id}`, JSON.stringify(pairPhotos));
       if (calPairIndex !== null) localStorage.setItem(`cal:${id}`, JSON.stringify(calPairIndex));
+      if (guestbookPairIndex !== null) localStorage.setItem(`guestbook:${id}`, JSON.stringify(guestbookPairIndex));
     }
-  }, [streaming, pairPhotos, calPairIndex]);
+  }, [streaming, pairPhotos, calPairIndex, guestbookPairIndex]);
 
   // Scroll conversation to bottom on update
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, pairPhotos, guestbookPending]);
+  }, [messages, pairPhotos]);
 
   const submit = async (text: string) => {
     const q = text.trim();
@@ -257,11 +261,9 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           setCalPairIndex((prev) => prev ?? pairIndex); // only set once; bot sometimes re-triggers
           chunk = chunk.replace("\x00SHOW_CAL\x00", "");
         }
-        chunk = chunk.replace("\x00SHOW_GUESTBOOK\x00", "");
-        const guestbookPendingMatch = chunk.match(/\x00GUESTBOOK_PENDING:([^\x00]+)\x00/);
-        if (guestbookPendingMatch) {
-          chunk = chunk.replace(guestbookPendingMatch[0], "");
-          try { setGuestbookPending(JSON.parse(guestbookPendingMatch[1])); } catch { }
+        if (chunk.includes("\x00SHOW_GUESTBOOK\x00")) {
+          setGuestbookPairIndex((prev) => prev ?? pairIndex);
+          chunk = chunk.replace("\x00SHOW_GUESTBOOK\x00", "");
         }
         const photoMatch = chunk.match(/\x00PHOTO:([^\x00]+)\x00/);
         if (photoMatch) {
@@ -377,6 +379,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (document.activeElement === textareaRef.current) return;
+      const tag = (document.activeElement as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (e.key.length === 1) textareaRef.current?.focus();
     };
@@ -426,13 +430,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     pairs.push({ q: messages[i].content, a: messages[i + 1]?.content ?? "" });
   }
 
-  const inputLocked = !!guestbookPending;
-
   const inputRow = (
     <div className="flex items-center gap-5">
       <button
         onClick={toggleMic}
-        disabled={streaming || micState === "transcribing" || inputLocked}
+        disabled={streaming || micState === "transcribing"}
         aria-label={micState === "listening" ? "Stop" : "Record"}
         className="shrink-0 disabled:opacity-30 transition-opacity"
       >
@@ -450,33 +452,32 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           aria-hidden
           className="font-sans text-[18px] md:text-[26px] leading-relaxed break-words whitespace-pre-wrap invisible pointer-events-none"
         >
-          {input || (inputLocked ? "drop any photo to post →" : (suggestedPrompt ?? "Ask anything")) || " "}
+          {input || suggestedPrompt || " "}
         </div>
         {/* Placeholder */}
         {!input && (
           <div
-            key={inputLocked ? "locked" : suggestedPrompt}
-            onClick={() => { if (!inputLocked) { submitPlaceholder(); textareaRef.current?.focus(); } }}
+            key={suggestedPrompt}
+            onClick={() => { submitPlaceholder(); textareaRef.current?.focus(); }}
             className={[
-              "absolute inset-0 font-sans text-[18px] md:text-[26px] leading-relaxed break-words animate-fade-in transition-all duration-[220ms]",
-              inputLocked ? "text-[#C8C4BE] cursor-default" : "text-[#C8C4BE] cursor-text",
+              "absolute inset-0 font-sans text-[18px] md:text-[26px] leading-relaxed break-words cursor-text animate-fade-in transition-all duration-[220ms]",
+              "text-[#C8C4BE]",
               promptSending ? "-translate-y-3 opacity-0" : "translate-y-0 opacity-100",
             ].join(" ")}
           >
-            {inputLocked ? "drop any photo to post →" : (suggestedPrompt ?? "Ask anything")}
+            {suggestedPrompt ?? "Ask anything"}
           </div>
         )}
         {/* Textarea — always absolute so it never shifts layout */}
         <textarea
           ref={textareaRef}
           value={input}
-          onChange={(e) => { if (!inputLocked) setInput(e.target.value); }}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           rows={1}
           onFocus={() => setInputFocused(true)}
           onBlur={() => setInputFocused(false)}
-          disabled={inputLocked}
-          className="absolute inset-0 w-full bg-transparent font-sans text-[18px] md:text-[26px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0 disabled:cursor-default"
+          className="absolute inset-0 w-full bg-transparent font-sans text-[18px] md:text-[26px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0"
         />
       </div>
       <button
@@ -487,7 +488,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             submit(input);
           }
         }}
-        disabled={(!input.trim() && !suggestedPrompt) || streaming || promptSending || inputLocked}
+        disabled={(!input.trim() && !suggestedPrompt) || streaming || promptSending}
         aria-label="Send"
         className={[
           "font-sans text-[18px] md:text-[26px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0",
@@ -559,13 +560,29 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   {!pair.q.startsWith("\x00") && (
                     <p className="font-sans text-[14px] text-[#9C9890] italic mb-5">— {pair.q}</p>
                   )}
-                  <p className="font-sans text-[18px] md:text-[22px] leading-[1.75] text-[#1B1B19] whitespace-pre-wrap">
-                    {renderWithLinks(pair.a)}
-                  </p>
                   {pairPhotos[i] && (
-                    <a href={pairPhotos[i]} target="_blank" rel="noopener noreferrer" className="block mt-6">
-                      <img src={pairPhotos[i]} alt="" className="w-full md:w-auto md:max-h-[220px] rounded-lg" />
+                    <a href={pairPhotos[i]} target="_blank" rel="noopener noreferrer" className="block mb-6">
+                      <img
+                        src={pairPhotos[i]}
+                        alt=""
+                        className="w-full md:w-auto md:max-h-[220px] rounded-lg"
+                        onLoad={() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }}
+                      />
                     </a>
+                  )}
+                  {guestbookPairIndex === i && (
+                    <div className="mb-6">
+                      <NewEntryCard onPosted={() => {
+                        setGuestbookPairIndex(null);
+                        const id = sessionIdRef.current;
+                        if (id) localStorage.removeItem(`guestbook:${id}`);
+                        setMessages((prev) => [
+                          ...prev,
+                          { role: "user", content: "\x00posted\x00" },
+                          { role: "assistant", content: "you're in the book. check it out: https://claudechen.me/guestbook" },
+                        ]);
+                      }} />
+                    </div>
                   )}
                   {calPairIndex === i && (
                     <iframe
@@ -573,24 +590,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                       width="100%"
                       height="600"
                       frameBorder="0"
-                      className="mt-6 rounded-lg"
+                      className="mb-6 rounded-lg"
                     />
                   )}
+                  <p className="font-sans text-[18px] md:text-[22px] leading-[1.75] text-[#1B1B19] whitespace-pre-wrap">
+                    {renderWithLinks(pair.a)}
+                  </p>
                 </div>
               ))}
-              {guestbookPending && (
-                <PhotoUploadButton
-                  pending={guestbookPending}
-                  onUploaded={() => {
-                    setGuestbookPending(null);
-                    setMessages((prev) => [
-                      ...prev,
-                      { role: "user", content: "\x00photo\x00" },
-                      { role: "assistant", content: "got it. you're in the book." },
-                    ]);
-                  }}
-                />
-              )}
             </div>
             {/* Spacer — padding-bottom is ignored by overflow containers on WebKit/mobile; a real element is required */}
             <div ref={bottomSpacerRef} />
@@ -609,51 +616,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       {buildTime && (
         <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none z-20">{buildTime}</span>
       )}
-    </div>
-  );
-}
-
-function PhotoUploadButton({ pending, onUploaded }: { pending: { name: string; message: string }; onUploaded: () => void }) {
-  const [preview, setPreview] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setPreview(URL.createObjectURL(file));
-    setUploading(true);
-    try {
-      const fd = new FormData();
-      fd.append("name", pending.name);
-      fd.append("message", pending.message);
-      fd.append("image", file);
-      await fetch("/api/guestbook", { method: "POST", body: fd });
-      onUploaded();
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div>
-      <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
-      <button
-        onClick={() => fileRef.current?.click()}
-        disabled={uploading}
-        className="flex items-center gap-3 group disabled:opacity-50 transition-opacity"
-      >
-        {preview ? (
-          <img src={preview} alt="" className="h-12 w-12 rounded object-cover" />
-        ) : (
-          <div className="h-12 w-12 rounded border border-dashed border-[#C8C4BE] group-hover:border-[#9C9890] transition-colors flex items-center justify-center shrink-0">
-            <span className="font-sans text-[18px] text-[#C8C4BE] group-hover:text-[#9C9890] transition-colors leading-none">+</span>
-          </div>
-        )}
-        <span className="font-sans text-[14px] text-[#9C9890]">
-          {uploading ? "uploading…" : "any photo — the cafe you're at, whatever"}
-        </span>
-      </button>
     </div>
   );
 }

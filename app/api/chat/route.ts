@@ -10,6 +10,12 @@ const kv = new Redis({
 
 const tools: Anthropic.Tool[] = [
   {
+    name: "show_guestbook",
+    description:
+      "Show the guest book form inline in the conversation so the visitor can fill it out directly — name, message, and a photo. Call this when someone wants to leave a note or sign the guest book.",
+    input_schema: { type: "object" as const, properties: {}, required: [] },
+  },
+  {
     name: "show_calendar",
     description:
       "Display the calendar booking widget so the visitor can schedule a meeting with Claude Chen. Only call this when the visitor explicitly asks to schedule, book, or set up a meeting or call — not for general conversation.",
@@ -44,25 +50,6 @@ const tools: Anthropic.Tool[] = [
         },
       },
       required: ["filename"],
-    },
-  },
-  {
-    name: "show_guestbook",
-    description:
-      "Start the guest book flow. Call this when someone wants to leave a note or sign the guest book, then immediately ask for their name.",
-    input_schema: { type: "object" as const, properties: {}, required: [] },
-  },
-  {
-    name: "save_guestbook_entry",
-    description:
-      "Stage the visitor's guest book entry after collecting their name and message. This does NOT save the entry yet — a photo is required to complete it. After calling this, tell the visitor their note is ready and to drop any photo below to post it — selfie, whatever, doesn't matter. The entry won't be saved until they do.",
-    input_schema: {
-      type: "object" as const,
-      properties: {
-        name: { type: "string" },
-        message: { type: "string" },
-      },
-      required: ["name", "message"],
     },
   },
   {
@@ -127,6 +114,10 @@ export async function POST(req: Request) {
             const input = block.input as Record<string, string>;
             let result = "done";
 
+            if (block.name === "show_guestbook") {
+              controller.enqueue(encoder.encode("\x00SHOW_GUESTBOOK\x00"));
+            }
+
             if (block.name === "show_calendar") {
               controller.enqueue(encoder.encode("\x00SHOW_CAL\x00"));
             }
@@ -143,19 +134,7 @@ export async function POST(req: Request) {
               );
             }
 
-            if (
-              block.name === "save_guestbook_entry" &&
-              input.name &&
-              input.message
-            ) {
-              const data = JSON.stringify({ name: input.name.trim(), message: input.message.trim() });
-              controller.enqueue(
-                encoder.encode(`\x00GUESTBOOK_PENDING:${data}\x00`)
-              );
-              result = "Ready. Waiting for photo.";
-            }
-
-            toolResults.push({
+toolResults.push({
               type: "tool_result",
               tool_use_id: block.id,
               content: result,
