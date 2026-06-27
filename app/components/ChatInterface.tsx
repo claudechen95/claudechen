@@ -362,6 +362,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   };
 
   const [promptSending, setPromptSending] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const usedPromptsRef = useRef(new Set<string>());
   const advancePrompt = (sent: string) => {
     usedPromptsRef.current.add(sent);
@@ -440,6 +441,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           rows={1}
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
           className="absolute inset-0 w-full bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0"
         />
       </div>
@@ -453,7 +456,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         }}
         disabled={(!input.trim() && !suggestedPrompt) || streaming || promptSending}
         aria-label="Send"
-        className="font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0"
+        className={[
+          "font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0",
+          pairs.length === 0 && !streaming && !promptSending ? "animate-pulse" : "",
+        ].join(" ")}
       >
         →
       </button>
@@ -484,12 +490,24 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   if (pairs.length === 0) {
     return (
-      <div className="flex items-center justify-center bg-[#F8F7F3] px-6 md:px-10" style={{ position: "fixed", top: "var(--vp-top, 0px)", left: 0, right: 0, height: "var(--vph, 100dvh)" }}>
+      <div className="flex flex-col bg-[#F8F7F3]" style={{ position: "fixed", top: "var(--vp-top, 0px)", left: 0, right: 0, height: "var(--vph, 100dvh)" }}>
         {guestbookLink}
-        <div className="w-full md:max-w-[560px]">{inputRow}</div>
         {buildTime && (
-          <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none">{buildTime}</span>
+          <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none">{buildTime}</span>
         )}
+        {/* Top spacer — always grows to push input toward center */}
+        <div className="flex-1" />
+        {/* Input */}
+        <div className="shrink-0 w-full px-6 md:px-10 py-5 md:max-w-[560px] mx-auto"
+          style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}>
+          {inputRow}
+        </div>
+        {/* Bottom spacer — collapses when focused so input slides to bottom */}
+        <div className="shrink-0 overflow-hidden" style={{
+          flex: "1 1 auto",
+          maxHeight: inputFocused ? "0px" : "50vh",
+          transition: "max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
+        }} />
       </div>
     );
   }
