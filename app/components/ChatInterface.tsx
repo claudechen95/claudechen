@@ -426,11 +426,13 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     pairs.push({ q: messages[i].content, a: messages[i + 1]?.content ?? "" });
   }
 
+  const inputLocked = !!guestbookEntryId;
+
   const inputRow = (
     <div className="flex items-center gap-5">
       <button
         onClick={toggleMic}
-        disabled={streaming || micState === "transcribing"}
+        disabled={streaming || micState === "transcribing" || inputLocked}
         aria-label={micState === "listening" ? "Stop" : "Record"}
         className="shrink-0 disabled:opacity-30 transition-opacity"
       >
@@ -446,33 +448,35 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         {/* Shadow div — always in flow, mirrors textarea content to set height */}
         <div
           aria-hidden
-          className="font-sans text-[18px] leading-relaxed break-words whitespace-pre-wrap invisible pointer-events-none"
+          className="font-sans text-[18px] md:text-[26px] leading-relaxed break-words whitespace-pre-wrap invisible pointer-events-none"
         >
-          {(input || " ")}
+          {input || (inputLocked ? "drop any photo to post →" : (suggestedPrompt ?? "Ask anything")) || " "}
         </div>
         {/* Placeholder */}
         {!input && (
           <div
-            key={suggestedPrompt}
-            onClick={() => { submitPlaceholder(); textareaRef.current?.focus(); }}
+            key={inputLocked ? "locked" : suggestedPrompt}
+            onClick={() => { if (!inputLocked) { submitPlaceholder(); textareaRef.current?.focus(); } }}
             className={[
-              "absolute inset-0 font-sans text-[18px] text-[#C8C4BE] leading-relaxed break-words cursor-text animate-fade-in transition-all duration-[220ms]",
+              "absolute inset-0 font-sans text-[18px] md:text-[26px] leading-relaxed break-words animate-fade-in transition-all duration-[220ms]",
+              inputLocked ? "text-[#C8C4BE] cursor-default" : "text-[#C8C4BE] cursor-text",
               promptSending ? "-translate-y-3 opacity-0" : "translate-y-0 opacity-100",
             ].join(" ")}
           >
-            {suggestedPrompt ?? "Ask anything"}
+            {inputLocked ? "drop any photo to post →" : (suggestedPrompt ?? "Ask anything")}
           </div>
         )}
         {/* Textarea — always absolute so it never shifts layout */}
         <textarea
           ref={textareaRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => { if (!inputLocked) setInput(e.target.value); }}
           onKeyDown={onKeyDown}
           rows={1}
           onFocus={() => setInputFocused(true)}
           onBlur={() => setInputFocused(false)}
-          className="absolute inset-0 w-full bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0"
+          disabled={inputLocked}
+          className="absolute inset-0 w-full bg-transparent font-sans text-[18px] md:text-[26px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0 disabled:cursor-default"
         />
       </div>
       <button
@@ -483,10 +487,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             submit(input);
           }
         }}
-        disabled={(!input.trim() && !suggestedPrompt) || streaming || promptSending}
+        disabled={(!input.trim() && !suggestedPrompt) || streaming || promptSending || inputLocked}
         aria-label="Send"
         className={[
-          "font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0",
+          "font-sans text-[18px] md:text-[26px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0",
           pairs.length === 0 && !streaming && !promptSending ? "animate-pulse-strong" : "",
         ].join(" ")}
       >
@@ -506,7 +510,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           window.location.href = guestbookHref;
         }
       }}
-      className="absolute top-6 right-6 md:right-10 z-20 font-sans text-[13px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
+      className="absolute top-6 right-6 md:right-10 z-20 font-sans text-[13px] md:text-[26px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
       guest book
     </Link>
@@ -631,18 +635,24 @@ function PhotoUploadButton({ entryId, onUploaded }: { entryId: string; onUploade
   };
 
   return (
-    <div className="flex items-center gap-4">
-      {preview ? (
-        <img src={preview} alt="" className="h-10 w-10 rounded object-cover opacity-60" />
-      ) : null}
+    <div>
+      <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
       <button
         onClick={() => fileRef.current?.click()}
         disabled={uploading}
-        className="font-sans text-[14px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors disabled:opacity-40"
+        className="flex items-center gap-3 group disabled:opacity-50 transition-opacity"
       >
-        {uploading ? "uploading…" : "+ add a photo"}
+        {preview ? (
+          <img src={preview} alt="" className="h-12 w-12 rounded object-cover" />
+        ) : (
+          <div className="h-12 w-12 rounded border border-dashed border-[#C8C4BE] group-hover:border-[#9C9890] transition-colors flex items-center justify-center shrink-0">
+            <span className="font-sans text-[18px] text-[#C8C4BE] group-hover:text-[#9C9890] transition-colors leading-none">+</span>
+          </div>
+        )}
+        <span className="font-sans text-[14px] text-[#9C9890]">
+          {uploading ? "uploading…" : "any photo — the cafe you're at, whatever"}
+        </span>
       </button>
-      <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
     </div>
   );
 }

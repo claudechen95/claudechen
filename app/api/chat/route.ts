@@ -55,7 +55,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: "save_guestbook_entry",
     description:
-      "Save the visitor's guest book entry after collecting their name and message through conversation. After calling this, the tool will return the saved entry id. Then tell the visitor their note is saved in your voice, and let them know they can add an optional photo below.",
+      "Save the visitor's guest book entry after collecting their name and message through conversation. After calling this, the tool will return the saved entry id. Then tell the visitor their note is saved in your voice, and tell them to drop any photo below to post it — the cafe you're at, whatever, doesn't matter.",
     input_schema: {
       type: "object" as const,
       properties: {

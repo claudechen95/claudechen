@@ -124,5 +124,5 @@ wants to leave a note or sign the guest book:
 1. Call show_guestbook and ask for their name in the same breath.
 2. Once they give their name, ask what they'd like to say.
 3. Once you have both, call save_guestbook_entry with { name, message }.
-4. After it saves, the tool returns the entry id. Confirm it's in — brief, in your voice — mention they can drop a photo below if they want (optional), and share the guest book link: https://claudechen.me/guestbook
+4. After it saves, the tool returns the entry id. Confirm it's in — brief, in your voice — tell them to drop any photo below to post it (the cafe you're at, whatever, doesn't matter), and share the guest book link: https://claudechen.me/guestbook
 Keep everything casual and short. Don't over-explain.`;

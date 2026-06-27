@@ -38,6 +38,30 @@ export async function POST(req: Request) {
   return Response.json(entry, { status: 201 });
 }
 
+// Delete one or more entries by id
+export async function DELETE(req: Request) {
+  const secret = process.env.ADMIN_SECRET;
+  const auth = req.headers.get("authorization");
+  if (!secret || auth !== `Bearer ${secret}`) {
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { ids } = await req.json() as { ids: string[] };
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return Response.json({ error: "ids must be a non-empty array" }, { status: 400 });
+  }
+
+  const toRemove = new Set(ids);
+  const entries = await kv.lrange<Entry>("guestbook", 0, -1);
+  const kept = entries.filter((e) => !toRemove.has(e.id));
+
+  await kv.del("guestbook");
+  if (kept.length > 0) await kv.rpush("guestbook", ...kept);
+
+  const removedCount = entries.length - kept.length;
+  return Response.json({ removed: removedCount, notFound: ids.length - removedCount, kept: kept.length });
+}
+
 // Attach a photo to an existing entry
 export async function PATCH(req: Request) {
   const formData = await req.formData();
