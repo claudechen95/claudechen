@@ -11,3 +11,39 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* ── Page-flip view transitions ── */
+
+/* Forward: chat → guestbook */
+@keyframes flip-out {
+  from { transform: perspective(1400px) rotateY(0deg); transform-origin: right center; }
+  to   { transform: perspective(1400px) rotateY(-90deg); transform-origin: right center; opacity: 0.4; }
+}
+@keyframes flip-in {
+  from { transform: perspective(1400px) rotateY(90deg); transform-origin: left center; opacity: 0.4; }
+  to   { transform: perspective(1400px) rotateY(0deg); transform-origin: left center; }
+}
+
+/* Back: guestbook → chat */
+@keyframes flip-back-out {
+  from { transform: perspective(1400px) rotateY(0deg); transform-origin: left center; }
+  to   { transform: perspective(1400px) rotateY(90deg); transform-origin: left center; opacity: 0.4; }
+}
+@keyframes flip-back-in {
+  from { transform: perspective(1400px) rotateY(-90deg); transform-origin: right center; opacity: 0.4; }
+  to   { transform: perspective(1400px) rotateY(0deg); transform-origin: right center; }
+}
+
+html[data-flip="forward"]::view-transition-old(root) {
+  animation: flip-out 0.4s ease-in forwards;
+}
+html[data-flip="forward"]::view-transition-new(root) {
+  animation: flip-in 0.4s ease-out forwards;
+}
+
+html[data-flip="back"]::view-transition-old(root) {
+  animation: flip-back-out 0.4s ease-in forwards;
+}
+html[data-flip="back"]::view-transition-new(root) {
+  animation: flip-back-in 0.4s ease-out forwards;
+}

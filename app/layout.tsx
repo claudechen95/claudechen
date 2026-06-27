@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
+import { ViewTransitions } from "next-view-transitions";
 import "./globals.css";
 import { PostHogProvider } from "./components/PostHogProvider";
 
@@ -46,10 +47,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
-      <body className="min-h-screen bg-[#F8F7F3]">
-        <PostHogProvider>{children}</PostHogProvider>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="en" className={`${playfair.variable} ${dmSans.variable}`}>
+        <body className="min-h-screen bg-[#F8F7F3]">
+          <PostHogProvider>{children}</PostHogProvider>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

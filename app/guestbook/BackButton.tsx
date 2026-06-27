@@ -1,23 +1,30 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
+import { Suspense } from "react";
 
 function BackButtonInner() {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from");
 
+  const handleBack = () => {
+    document.documentElement.dataset.flip = "back";
+    setTimeout(() => delete document.documentElement.dataset.flip, 700);
+    if (from) router.push(from);
+    else router.back();
+  };
+
   return (
     <button
-      onClick={() => (from ? router.push(from) : router.back())}
+      onClick={handleBack}
       className="font-sans text-[14px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
       ← back
     </button>
   );
 }
-
-import { Suspense } from "react";
 
 export default function BackButton() {
   return (

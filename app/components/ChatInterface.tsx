@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, KeyboardEvent } from "react";
-import Link from "next/link";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { usePostHog } from "posthog-js/react";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -76,6 +76,7 @@ function renderWithLinks(text: string) {
 
 export default function ChatInterface({ initialSessionId }: { initialSessionId?: string }) {
   const posthog = usePostHog();
+  const router = useTransitionRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -122,6 +123,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     try {
       const saved = localStorage.getItem(`session:${initialSessionId}`);
       if (saved) setMessages(JSON.parse(saved));
+      const savedPhotos = localStorage.getItem(`photos:${initialSessionId}`);
+      if (savedPhotos) setPairPhotos(JSON.parse(savedPhotos));
     } catch { }
   }, [initialSessionId]);
 
@@ -130,8 +133,9 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     const id = sessionIdRef.current;
     if (!streaming && id && messages.length > 0) {
       localStorage.setItem(`session:${id}`, JSON.stringify(messages));
+      localStorage.setItem(`photos:${id}`, JSON.stringify(pairPhotos));
     }
-  }, [streaming]);
+  }, [streaming, pairPhotos]);
 
   // Scroll conversation to bottom on update
   useEffect(() => {
@@ -334,6 +338,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     startRecording(false);
   };
 
+  const [promptSending, setPromptSending] = useState(false);
   const usedPromptsRef = useRef(new Set<string>());
   const advancePrompt = (sent: string) => {
     usedPromptsRef.current.add(sent);
@@ -341,12 +346,22 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     setSuggestedPrompt(pickUnusedPrompt(usedPromptsRef.current));
   };
 
+  const submitPlaceholder = () => {
+    if (!suggestedPrompt || streamingRef.current) return;
+    setPromptSending(true);
+    const prompt = suggestedPrompt;
+    setTimeout(() => {
+      setPromptSending(false);
+      advancePrompt(prompt);
+      submit(prompt);
+    }, 220);
+  };
+
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (!input.trim() && suggestedPrompt) {
-        advancePrompt(suggestedPrompt);
-        submit(suggestedPrompt);
+        submitPlaceholder();
       } else {
         submit(input);
       }
@@ -377,8 +392,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       <div className="relative flex-1">
         {!input && (
           <div
-            onClick={() => textareaRef.current?.focus()}
-            className="font-sans text-[18px] text-[#C8C4BE] leading-relaxed break-words cursor-text"
+            key={suggestedPrompt}
+            onClick={() => { submitPlaceholder(); textareaRef.current?.focus(); }}
+            className={[
+              "font-sans text-[18px] text-[#C8C4BE] leading-relaxed break-words cursor-text animate-fade-in transition-all duration-[220ms]",
+              promptSending ? "-translate-y-3 opacity-0" : "translate-y-0 opacity-100",
+            ].join(" ")}
           >
             {suggestedPrompt ?? "Ask anything"}
           </div>
@@ -402,13 +421,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       <button
         onClick={() => {
           if (!input.trim() && suggestedPrompt) {
-            advancePrompt(suggestedPrompt);
-            submit(suggestedPrompt);
+            submitPlaceholder();
           } else {
             submit(input);
           }
         }}
-        disabled={(!input.trim() && !suggestedPrompt) || streaming}
+        disabled={(!input.trim() && !suggestedPrompt) || streaming || promptSending}
         aria-label="Send"
         className="font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0 pb-0.5"
       >
@@ -417,9 +435,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     </div>
   );
 
+  const guestbookHref = sessionId ? `/guestbook?from=/chat/${sessionId}` : "/guestbook";
   const guestbookLink = (
     <Link
-      href={sessionId ? `/guestbook?from=/chat/${sessionId}` : "/guestbook"}
+      href={guestbookHref}
+      onClick={() => { document.documentElement.dataset.flip = "forward"; setTimeout(() => delete document.documentElement.dataset.flip, 700); }}
       className="absolute top-6 right-6 md:right-10 z-20 font-sans text-[13px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
     >
       guest book
@@ -446,7 +466,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           <div className="w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 pt-16 pb-4">
             <div className="space-y-10 md:space-y-14">
               {pairs.map((pair, i) => (
-                <div key={i}>
+                <div key={i} className="animate-fade-slide-up">
                   {!pair.q.startsWith("\x00") && (
                     <p className="font-sans text-[14px] text-[#9C9890] italic mb-5">— {pair.q}</p>
                   )}
