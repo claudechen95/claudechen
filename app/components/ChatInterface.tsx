@@ -107,15 +107,28 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => { streamingRef.current = streaming; }, [streaming]);
   useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
-  // Fix iOS Safari first-tap keyboard bug: 100dvh doesn't update on first keyboard open.
-  // Track visualViewport.height directly and expose it as --vph for container heights.
+  // Fix iOS Safari keyboard bugs:
+  // - First tap: 100dvh doesn't update → use visualViewport.height for --vph
+  // - Subsequent taps: iOS scrolls the body (offsetTop > 0) making container float up
+  //   → lock body scroll so the container always starts at y=0
   useEffect(() => {
+    const prev = { html: document.documentElement.style.overflow, body: document.body.style.overflow };
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
     const vv = window.visualViewport;
-    if (!vv) return;
+    if (!vv) return () => {
+      document.documentElement.style.overflow = prev.html;
+      document.body.style.overflow = prev.body;
+    };
     const update = () => document.documentElement.style.setProperty("--vph", `${vv.height}px`);
     update();
     vv.addEventListener("resize", update);
-    return () => vv.removeEventListener("resize", update);
+    return () => {
+      vv.removeEventListener("resize", update);
+      document.documentElement.style.overflow = prev.html;
+      document.body.style.overflow = prev.body;
+    };
   }, []);
 
   useEffect(() => {
