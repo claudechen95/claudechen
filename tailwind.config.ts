@@ -22,10 +22,15 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(12px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        pulseStrong: {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.3", transform: "scale(1.35)" },
+        },
       },
       animation: {
         "fade-in": "fadeIn 0.25s ease-out",
         "fade-slide-up": "fadeSlideUp 0.4s ease-out",
+        "pulse-strong": "pulseStrong 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

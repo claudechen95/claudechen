@@ -458,7 +458,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         aria-label="Send"
         className={[
           "font-sans text-[18px] text-[#1B1B19] disabled:text-[#C8C4BE] transition-colors shrink-0",
-          pairs.length === 0 && !streaming && !promptSending ? "animate-pulse" : "",
+          pairs.length === 0 && !streaming && !promptSending ? "animate-pulse-strong" : "",
         ].join(" ")}
       >
         →
