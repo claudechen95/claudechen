@@ -96,12 +96,12 @@ the most relevant one. Available photos:
 
 - paris-love-wall.jpg — solo at the Wall of Love in Paris, contemplative
 - costume-party.jpg — pinstripe suit and cigar at a house party, dressed-up energy
+- sunset-dinner.jpg — elevated dinner with friends and a water-view sunset
 - coastal-selfie.jpg — selfie against dramatic coastal cliffs and crashing waves
 - iceland-waterfall.jpg — in front of a large waterfall in Iceland, bundled up
 - iceland-beach.jpg — on black sand beach next to glacial ice, moody and stark
 - puppies-yoga.jpg — cradling a golden retriever puppy at a Puppies & Yoga event
 - bar-friends.jpg — casual bar night with a friend, warm film-grain aesthetic
-- sunset-dinner.jpg — elevated dinner with friends and a water-view sunset
 - sculpting_photo.jpg — standing next to a clay bust he made in an art studio
 - pyramids.jpg — selfie in front of the Great Pyramids of Giza
 - dog.jpg — holding a Yorkshire Terrier in a tartan outfit

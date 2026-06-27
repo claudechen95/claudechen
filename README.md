@@ -14,10 +14,12 @@ Personal website. An AI version of me answers questions about who I am and what 
 
 ## Features
 
-- Chat with an AI version of me — asks about my background, work, and what I'm building
-- Voice input via microphone
-- Photo display, calendar booking, and guestbook tools
-- Guestbook with polaroid-style photo wall
+- **Answers questions in my voice** — visitors chat with an AI stand-in that knows my background, work, and story
+- **Embeds photos inline** — ask something visual ("are you secretly ugly?") and a real photo appears in the conversation
+- **Won't hallucinate** — for anything outside its knowledge it defers to the real me rather than inventing an answer
+- **Inline guestbook** — ask to leave a note and a polaroid card appears in the chat; fill in a message, add a photo, and post without leaving the page
+- **Meeting booking** — ask to schedule a call and a Cal.com embed appears inline in the conversation
+- **Polaroid photo wall** — all guestbook entries live at /guestbook as a wall of rotating polaroids with a lightbox on click
 
 ## Dev
 
