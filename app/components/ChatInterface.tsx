@@ -107,7 +107,13 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
   useEffect(() => {
-    setSuggestedPrompt(pickUnusedPrompt(new Set()));
+    try {
+      const used = new Set<string>(JSON.parse(sessionStorage.getItem("cc_used_prompts") || "[]"));
+      usedPromptsRef.current = used;
+      setSuggestedPrompt(pickUnusedPrompt(used));
+    } catch {
+      setSuggestedPrompt(pickUnusedPrompt(new Set()));
+    }
   }, []);
 
   // Load session from localStorage
@@ -331,6 +337,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const usedPromptsRef = useRef(new Set<string>());
   const advancePrompt = (sent: string) => {
     usedPromptsRef.current.add(sent);
+    try { sessionStorage.setItem("cc_used_prompts", JSON.stringify([...usedPromptsRef.current])); } catch { }
     setSuggestedPrompt(pickUnusedPrompt(usedPromptsRef.current));
   };
 
