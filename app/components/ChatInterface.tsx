@@ -244,7 +244,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history, visitorName: sessionIdRef.current ? visitorName : null }),
+        body: JSON.stringify({ messages: history, visitorName: sessionIdRef.current ? visitorName : null, sessionId: currentSessionId }),
       });
 
       if (!res.ok || !res.body) throw new Error();

@@ -67,7 +67,7 @@ const tools: Anthropic.Tool[] = [
 ];
 
 export async function POST(req: Request) {
-  const { messages, visitorName } = await req.json();
+  const { messages, visitorName, sessionId } = await req.json();
 
   const system = visitorName
     ? `${SYSTEM_PROMPT}\n\n— RETURNING VISITOR —\nThis visitor's name is ${visitorName}. Use it naturally.`
@@ -80,6 +80,7 @@ export async function POST(req: Request) {
       try {
         let currentMessages: Anthropic.MessageParam[] = messages;
         const MAX_TURNS = 5;
+        let lastAssistantText = "";
 
         for (let turn = 0; turn < MAX_TURNS; turn++) {
           const stream = client.messages.stream({
@@ -91,14 +92,17 @@ export async function POST(req: Request) {
           });
 
           // Stream text to the client as it arrives
+          let turnText = "";
           for await (const event of stream) {
             if (
               event.type === "content_block_delta" &&
               event.delta.type === "text_delta"
             ) {
+              turnText += event.delta.text;
               controller.enqueue(encoder.encode(event.delta.text));
             }
           }
+          if (turnText) lastAssistantText = turnText;
 
           const finalMsg = await stream.finalMessage();
           const toolBlocks = finalMsg.content.filter(
@@ -146,6 +150,23 @@ toolResults.push({
             { role: "assistant", content: finalMsg.content },
             { role: "user", content: toolResults },
           ];
+        }
+        // Persist conversation to Redis
+        if (sessionId) {
+          try {
+            const toSave = lastAssistantText
+              ? [...messages, { role: "assistant", content: lastAssistantText }]
+              : messages;
+            await kv.set(`conv:${sessionId}`, {
+              sessionId,
+              visitorName: visitorName ?? null,
+              messages: toSave,
+              updatedAt: new Date().toISOString(),
+            });
+            await kv.zadd("conv_index", { score: Date.now(), member: sessionId });
+          } catch (e) {
+            console.error("[conv save]", e);
+          }
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
