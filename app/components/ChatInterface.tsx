@@ -437,7 +437,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           onKeyDown={onKeyDown}
           rows={1}
           className={[
-            "bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed caret-transparent",
+            "bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed md:caret-transparent",
             input ? "w-full" : "absolute inset-0 opacity-0 cursor-text",
           ].join(" ")}
         />
