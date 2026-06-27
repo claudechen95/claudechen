@@ -519,7 +519,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
       {/* Scrollable messages */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
-          <div className="w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 pt-16 pb-4">
+          <div className="w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 pt-16 pb-16">
             <div className="space-y-10 md:space-y-14">
               {pairs.map((pair, i) => (
                 <div key={i} className="animate-fade-slide-up">
