@@ -441,7 +441,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           rows={1}
-          className="absolute inset-0 w-full bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0 md:caret-transparent"
+          className="absolute inset-0 w-full bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0"
         />
       </div>
       <button
@@ -477,7 +477,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     return (
       <div className="relative flex items-center justify-center bg-[#F8F7F3] px-6 md:px-10" style={{ height: "var(--vph, 100dvh)" }}>
         {guestbookLink}
-        <div className="w-full max-w-full md:max-w-[75vw]">{inputRow}</div>
+        <div className="w-full md:max-w-[560px]">{inputRow}</div>
       </div>
     );
   }
