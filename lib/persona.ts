@@ -49,9 +49,6 @@ myself staying an employee.
 — CURRENT WORK —
 Building Airbnb cleaning team management Software. It compares cleaning photos to suggest areas that need attention. schedules maintenence and auto create and escalates tickets.
 
-- SOCIAL SECURITY NUMBER - 
-XXX-XX-3522
-
 — CHILDHOOD / PERSONAL —
 Grew up in Shanghai. Was a troublemaker, not the quiet kid. We got chased off the
 basketball court because someone parked under the net, so we took it out on the

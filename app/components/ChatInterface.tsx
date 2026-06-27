@@ -13,7 +13,7 @@ const FIRST_PROMPT = "Hello Claude, describe yourself in 10 words or less";
 const PROMPTS = [
   "what are you building?",
   "why'd you quit your job?",
-  "what did you do at Amazon / Coupang?",
+  "what did you do at your previous jobs?",
   "why entrepreneurship?",
   "tell me something about growing up",
   "what are your hobbies?",
@@ -88,6 +88,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [calPairIndex, setCalPairIndex] = useState<number | null>(null);
   const [guestbookEntryId, setGuestbookEntryId] = useState<string | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
+  const [sessionLoaded, setSessionLoaded] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputBarRef = useRef<HTMLDivElement>(null);
@@ -153,7 +154,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   // Load session from localStorage
   useEffect(() => {
-    if (!initialSessionId) return;
+    if (!initialSessionId) {
+      setSessionLoaded(true);
+      return;
+    }
     try {
       const saved = localStorage.getItem(`session:${initialSessionId}`);
       if (saved) setMessages(JSON.parse(saved));
@@ -162,7 +166,18 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       const savedCal = localStorage.getItem(`cal:${initialSessionId}`);
       if (savedCal !== null) setCalPairIndex(JSON.parse(savedCal));
     } catch { }
+    setSessionLoaded(true);
   }, [initialSessionId]);
+
+  // Auto-submit ?send= message (e.g. from "leave a note" button on guestbook page)
+  useEffect(() => {
+    if (!sessionLoaded) return;
+    const params = new URLSearchParams(window.location.search);
+    const msg = params.get("send");
+    if (!msg) return;
+    window.history.replaceState(null, "", window.location.pathname);
+    submitRef.current(msg);
+  }, [sessionLoaded]);
 
   // Save to localStorage when streaming completes
   useEffect(() => {
