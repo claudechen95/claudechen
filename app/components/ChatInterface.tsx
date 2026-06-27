@@ -414,32 +414,34 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         )}
       </button>
       <div className="relative flex-1">
+        {/* Shadow div — always in flow, mirrors textarea content to set height */}
+        <div
+          aria-hidden
+          className="font-sans text-[18px] leading-relaxed break-words whitespace-pre-wrap invisible pointer-events-none"
+        >
+          {(input || " ")}
+        </div>
+        {/* Placeholder */}
         {!input && (
           <div
             key={suggestedPrompt}
             onClick={() => { submitPlaceholder(); textareaRef.current?.focus(); }}
             className={[
-              "font-sans text-[18px] text-[#C8C4BE] leading-relaxed break-words cursor-text animate-fade-in transition-all duration-[220ms]",
+              "absolute inset-0 font-sans text-[18px] text-[#C8C4BE] leading-relaxed break-words cursor-text animate-fade-in transition-all duration-[220ms]",
               promptSending ? "-translate-y-3 opacity-0" : "translate-y-0 opacity-100",
             ].join(" ")}
           >
             {suggestedPrompt ?? "Ask anything"}
           </div>
         )}
+        {/* Textarea — always absolute so it never shifts layout */}
         <textarea
           ref={textareaRef}
           value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            e.target.style.height = "auto";
-            e.target.style.height = e.target.scrollHeight + "px";
-          }}
+          onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           rows={1}
-          className={[
-            "bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0 md:caret-transparent",
-            input ? "w-full" : "absolute inset-0 opacity-0 cursor-text",
-          ].join(" ")}
+          className="absolute inset-0 w-full bg-transparent font-sans text-[18px] text-[#1B1B19] resize-none outline-none leading-relaxed py-0 md:caret-transparent"
         />
       </div>
       <button
