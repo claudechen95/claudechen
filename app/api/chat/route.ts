@@ -12,7 +12,7 @@ const tools: Anthropic.Tool[] = [
   {
     name: "show_calendar",
     description:
-      "Display the calendar booking widget so the visitor can schedule a meeting with Claude Chen. Call this whenever the visitor expresses interest in meeting, scheduling, booking, or talking on a call.",
+      "Display the calendar booking widget so the visitor can schedule a meeting with Claude Chen. Only call this when the visitor explicitly asks to schedule, book, or set up a meeting or call — not for general conversation.",
     input_schema: { type: "object" as const, properties: {}, required: [] },
   },
   {

@@ -108,27 +108,22 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => { streamingRef.current = streaming; }, [streaming]);
   useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
-  // Fix iOS Safari keyboard bugs:
-  // - First tap: 100dvh doesn't update → use visualViewport.height for --vph
-  // - Subsequent taps: iOS scrolls the body (offsetTop > 0) making container float up
-  //   → lock body scroll so the container always starts at y=0
+  // Mobile keyboard fix (iOS Safari + iOS Chrome):
+  // Use position:fixed on the container (set via CSS vars) and track both visualViewport
+  // height AND offsetTop so the container always exactly covers the visible area.
   useEffect(() => {
-    const prev = { html: document.documentElement.style.overflow, body: document.body.style.overflow };
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.overflow = "hidden";
-
     const vv = window.visualViewport;
-    if (!vv) return () => {
-      document.documentElement.style.overflow = prev.html;
-      document.body.style.overflow = prev.body;
+    if (!vv) return;
+    const update = () => {
+      document.documentElement.style.setProperty("--vph", `${vv.height}px`);
+      document.documentElement.style.setProperty("--vp-top", `${vv.offsetTop}px`);
     };
-    const update = () => document.documentElement.style.setProperty("--vph", `${vv.height}px`);
     update();
     vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
     return () => {
       vv.removeEventListener("resize", update);
-      document.documentElement.style.overflow = prev.html;
-      document.body.style.overflow = prev.body;
+      vv.removeEventListener("scroll", update);
     };
   }, []);
 
@@ -230,7 +225,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
         let chunk = decoder.decode(value, { stream: true });
         if (chunk.includes("\x00SHOW_CAL\x00")) {
-          setCalPairIndex(pairIndex);
+          setCalPairIndex((prev) => prev ?? pairIndex); // only set once; bot sometimes re-triggers
           chunk = chunk.replace("\x00SHOW_CAL\x00", "");
         }
         chunk = chunk.replace("\x00SHOW_GUESTBOOK\x00", "");
@@ -489,7 +484,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   if (pairs.length === 0) {
     return (
-      <div className="relative flex items-center justify-center bg-[#F8F7F3] px-6 md:px-10" style={{ height: "var(--vph, 100dvh)" }}>
+      <div className="flex items-center justify-center bg-[#F8F7F3] px-6 md:px-10" style={{ position: "fixed", top: "var(--vp-top, 0px)", left: 0, right: 0, height: "var(--vph, 100dvh)" }}>
         {guestbookLink}
         <div className="w-full md:max-w-[560px]">{inputRow}</div>
         {buildTime && (
@@ -500,7 +495,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   }
 
   return (
-    <div className="relative flex flex-col bg-[#F8F7F3]" style={{ height: "var(--vph, 100dvh)" }}>
+    <div className="flex flex-col bg-[#F8F7F3]" style={{ position: "fixed", top: "var(--vp-top, 0px)", left: 0, right: 0, height: "var(--vph, 100dvh)" }}>
       {guestbookLink}
       <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
 
@@ -517,7 +512,9 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                     {renderWithLinks(pair.a)}
                   </p>
                   {pairPhotos[i] && (
-                    <img src={pairPhotos[i]} alt="" className="mt-6 w-full rounded-lg object-cover max-h-[400px]" />
+                    <a href={pairPhotos[i]} target="_blank" rel="noopener noreferrer" className="block mt-6">
+                      <img src={pairPhotos[i]} alt="" className="w-full rounded-lg" />
+                    </a>
                   )}
                   {calPairIndex === i && (
                     <iframe
