@@ -544,6 +544,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       >
         {inputRow}
       </div>
+
+      {buildTime && (
+        <span className="absolute bottom-4 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none z-20">{buildTime}</span>
+      )}
     </div>
   );
 }
