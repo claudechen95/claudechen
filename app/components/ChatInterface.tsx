@@ -90,6 +90,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputBarRef = useRef<HTMLDivElement>(null);
+  const bottomSpacerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const submitRef = useRef<(text: string) => Promise<void>>(async () => { });
@@ -125,6 +127,18 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       vv.removeEventListener("resize", update);
       vv.removeEventListener("scroll", update);
     };
+  }, []);
+
+  // Keep bottom spacer height in sync with the input bar so the last message is never hidden
+  useEffect(() => {
+    const bar = inputBarRef.current;
+    const spacer = bottomSpacerRef.current;
+    if (!bar || !spacer) return;
+    const ro = new ResizeObserver(() => {
+      spacer.style.height = `${bar.offsetHeight}px`;
+    });
+    ro.observe(bar);
+    return () => ro.disconnect();
   }, []);
 
   useEffect(() => {
@@ -519,7 +533,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
       {/* Scrollable messages */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
-          <div className="w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 pt-16 pb-16">
+          <div className="w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 pt-16">
             <div className="space-y-10 md:space-y-14">
               {pairs.map((pair, i) => (
                 <div key={i} className="animate-fade-slide-up">
@@ -559,11 +573,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                 />
               )}
             </div>
+            {/* Spacer — padding-bottom is ignored by overflow containers on WebKit/mobile; a real element is required */}
+            <div ref={bottomSpacerRef} />
           </div>
       </div>
 
       {/* Sticky input */}
       <div
+        ref={inputBarRef}
         className="shrink-0 w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 py-5"
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
