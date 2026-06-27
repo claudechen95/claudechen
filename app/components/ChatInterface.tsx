@@ -473,11 +473,18 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   );
 
   // Empty state: input centered in viewport
+  const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME
+    ? new Date(process.env.NEXT_PUBLIC_BUILD_TIME).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+    : null;
+
   if (pairs.length === 0) {
     return (
       <div className="relative flex items-center justify-center bg-[#F8F7F3] px-6 md:px-10" style={{ height: "var(--vph, 100dvh)" }}>
         {guestbookLink}
         <div className="w-full md:max-w-[560px]">{inputRow}</div>
+        {buildTime && (
+          <span className="absolute bottom-4 left-6 font-sans text-[11px] text-[#C8C4BE] select-none">{buildTime}</span>
+        )}
       </div>
     );
   }
