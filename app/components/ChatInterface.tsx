@@ -85,6 +85,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [pairPhotos, setPairPhotos] = useState<Record<number, string>>({});
+  const [calPairIndex, setCalPairIndex] = useState<number | null>(null);
   const [guestbookEntryId, setGuestbookEntryId] = useState<string | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
 
@@ -149,6 +150,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       if (saved) setMessages(JSON.parse(saved));
       const savedPhotos = localStorage.getItem(`photos:${initialSessionId}`);
       if (savedPhotos) setPairPhotos(JSON.parse(savedPhotos));
+      const savedCal = localStorage.getItem(`cal:${initialSessionId}`);
+      if (savedCal !== null) setCalPairIndex(JSON.parse(savedCal));
     } catch { }
   }, [initialSessionId]);
 
@@ -158,8 +161,9 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     if (!streaming && id && messages.length > 0) {
       localStorage.setItem(`session:${id}`, JSON.stringify(messages));
       localStorage.setItem(`photos:${id}`, JSON.stringify(pairPhotos));
+      if (calPairIndex !== null) localStorage.setItem(`cal:${id}`, JSON.stringify(calPairIndex));
     }
-  }, [streaming, pairPhotos]);
+  }, [streaming, pairPhotos, calPairIndex]);
 
   // Scroll conversation to bottom on update
   useEffect(() => {
@@ -225,7 +229,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         if (done) break;
 
         let chunk = decoder.decode(value, { stream: true });
-        chunk = chunk.replace("\x00SHOW_CAL\x00", "");
+        if (chunk.includes("\x00SHOW_CAL\x00")) {
+          setCalPairIndex(pairIndex);
+          chunk = chunk.replace("\x00SHOW_CAL\x00", "");
+        }
         chunk = chunk.replace("\x00SHOW_GUESTBOOK\x00", "");
         const guestbookIdMatch = chunk.match(/\x00GUESTBOOK_ID:([^\x00]+)\x00/);
         if (guestbookIdMatch) {
@@ -512,6 +519,15 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   {pairPhotos[i] && (
                     <img src={pairPhotos[i]} alt="" className="mt-6 w-full rounded-lg object-cover max-h-[400px]" />
                   )}
+                  {calPairIndex === i && (
+                    <iframe
+                      src="https://cal.com/claudechen/30min?embed=true&theme=light&overlayCalendar=true"
+                      width="100%"
+                      height="600"
+                      frameBorder="0"
+                      className="mt-6 rounded-lg"
+                    />
+                  )}
                 </div>
               ))}
               {guestbookEntryId && (
@@ -527,13 +543,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   }}
                 />
               )}
-              <iframe
-                src="https://cal.com/claudechen/30min?embed=true&theme=light&overlayCalendar=true"
-                width="100%"
-                height="600"
-                frameBorder="0"
-                className="rounded-lg"
-              />
             </div>
           </div>
       </div>
