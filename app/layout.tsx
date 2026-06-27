@@ -19,7 +19,6 @@ const dmSans = DM_Sans({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  interactiveWidget: "resizes-visual",
 };
 
 export const metadata: Metadata = {

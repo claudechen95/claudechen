@@ -432,11 +432,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   return (
     <div className="relative flex flex-col h-[100dvh] bg-[#F8F7F3]">
       {guestbookLink}
+      <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
 
       {/* Scrollable messages */}
-      <div className="relative flex-1 overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-12 z-10 pointer-events-none" style={{ background: "linear-gradient(to bottom, #F8F7F3, transparent)" }} />
-        <div ref={scrollRef} className="h-full overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto">
           <div className="w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 pt-16 pb-4">
             <div className="space-y-10 md:space-y-14">
               {pairs.map((pair, i) => (
@@ -476,7 +475,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
               )}
             </div>
           </div>
-        </div>
       </div>
 
       {/* Sticky input */}
