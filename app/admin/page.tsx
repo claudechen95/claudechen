@@ -22,9 +22,10 @@ function formatDate(iso: string) {
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: { secret?: string };
+  searchParams: Promise<{ secret?: string }>;
 }) {
-  if (searchParams.secret !== process.env.ADMIN_SECRET) return notFound();
+  const { secret } = await searchParams;
+  if (secret !== process.env.ADMIN_SECRET) return notFound();
 
   const ids = (await kv.zrange<string[]>("conv_index", 0, -1)).reverse();
   const convs = (
