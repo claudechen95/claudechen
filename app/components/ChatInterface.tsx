@@ -16,6 +16,7 @@ const PROMPTS = [
   "hows founder life?",
   "are you secretly ugly? Prove it",
   "how can I reach you?",
+  "have you been outside of the country",
   "Let's meet",
   "sign the guest book",
 ];
@@ -259,7 +260,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         if (photoMatches.length > 0) {
           const newUrls = photoMatches.map((m) => `/api/photos/${m[1]}`);
           setPairPhotos((prev) => ({ ...prev, [pairIndex]: [...(prev[pairIndex] ?? []), ...newUrls] }));
-          chunk = chunk.replace(/\x00PHOTO:[^\x00]+\x00/g, "");
+          chunk = chunk.replace(/\x00PHOTO:[^\x00]+\x00/g, " ");
         }
         const visitorMatch = chunk.match(/\x00VISITOR:([^\x00]+)\x00/);
         if (visitorMatch) {
