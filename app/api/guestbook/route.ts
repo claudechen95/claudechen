@@ -1,5 +1,16 @@
 import { Redis } from "@upstash/redis";
 import { put } from "@vercel/blob";
+import sharp from "sharp";
+
+async function normalizeImage(file: File): Promise<{ buffer: Buffer; filename: string; contentType: string }> {
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const isHeic = file.type === "image/heic" || file.type === "image/heif" || /\.heic$/i.test(file.name) || /\.heif$/i.test(file.name);
+  if (isHeic) {
+    const jpeg = await sharp(buffer).jpeg({ quality: 90 }).toBuffer();
+    return { buffer: jpeg, filename: file.name.replace(/\.hei[cf]$/i, ".jpg"), contentType: "image/jpeg" };
+  }
+  return { buffer, filename: file.name, contentType: file.type };
+}
 
 const kv = new Redis({
   url: process.env.personalwebsite_KV_REST_API_URL!,
@@ -36,8 +47,10 @@ export async function POST(req: Request) {
     return Response.json({ error: "Image too large (max 5MB)" }, { status: 400 });
   }
 
-  const blob = await put(`guestbook/${Date.now()}-${file.name}`, file, {
+  const { buffer, filename, contentType } = await normalizeImage(file);
+  const blob = await put(`guestbook/${Date.now()}-${filename}`, buffer, {
     access: "private",
+    contentType,
     token: process.env.BLOB_READ_WRITE_TOKEN,
   });
   const imageUrl = `/api/guestbook/image?p=${encodeURIComponent(blob.url)}`;
@@ -91,8 +104,10 @@ export async function PATCH(req: Request) {
     return Response.json({ error: "Image too large (max 5MB)" }, { status: 400 });
   }
 
-  const blob = await put(`guestbook/${Date.now()}-${file.name}`, file, {
+  const { buffer, filename, contentType } = await normalizeImage(file);
+  const blob = await put(`guestbook/${Date.now()}-${filename}`, buffer, {
     access: "private",
+    contentType,
     token: process.env.BLOB_READ_WRITE_TOKEN,
   });
   const imageUrl = `/api/guestbook/image?p=${encodeURIComponent(blob.url)}`;

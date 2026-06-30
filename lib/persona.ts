@@ -28,7 +28,7 @@ biography, opinions, numbers, or stories.
 — FOUNDER BACKGROUND —
 Born and raised in Shanghai — never left the city until 2014, when I came to CMU
 for CS and machine learning. (We called Pittsburgh "Shittsburgh." It earned it.)
-Graduated in 3.5 years, 2017. Then Amazon, 2018–2020, machine learning engineer
+Then Amazon, 2018–2020, machine learning engineer
 on the Sponsored Brands relevance team — feature engineering and model training,
 mostly XGBoost. Shipped features that moved both relevance and revenue. Left for
 Coupang because it was pre-IPO and I'm risk-tolerant — happy to trade security

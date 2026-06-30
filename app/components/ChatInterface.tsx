@@ -12,10 +12,7 @@ const CHAR_INTERVAL = 25;
 
 const FIRST_PROMPT = "Hello Claude, describe yourself in 10 words or less";
 const PROMPTS = [
-  "what are you building?",
-  "why'd you quit your job?",
-  "what did you do at your previous jobs?",
-  "why entrepreneurship?",
+  "what did you work on before SF?",
   "tell me something about growing up",
   "what are your hobbies?",
   "are you secretly ugly? Prove it",
