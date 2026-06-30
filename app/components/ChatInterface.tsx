@@ -6,7 +6,6 @@ import { usePostHog } from "posthog-js/react";
 import { NewEntryCard } from "@/app/guestbook/PolaroidWall";
 
 type Message = { role: "user" | "assistant"; content: string };
-type MicState = "idle" | "listening" | "transcribing";
 
 const CHAR_INTERVAL = 25;
 
@@ -78,7 +77,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
-  const [micState, setMicState] = useState<MicState>("idle");
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
 
   const [visitorName, setVisitorName] = useState<string | null>(null);
@@ -92,11 +90,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const inputBarRef = useRef<HTMLDivElement>(null);
   const bottomSpacerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const submitRef = useRef<(text: string) => Promise<void>>(async () => { });
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const rafRef = useRef<number>(0);
-  const micStateRef = useRef<MicState>("idle");
   const streamingRef = useRef(false);
   const sessionIdRef = useRef<string | null>(initialSessionId ?? null);
 
@@ -105,7 +99,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const streamDoneRef = useRef(false);
   const revealIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => { micStateRef.current = micState; }, [micState]);
   useEffect(() => { streamingRef.current = streaming; }, [streaming]);
   useEffect(() => { sessionIdRef.current = sessionId; }, [sessionId]);
 
@@ -284,95 +277,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   useEffect(() => { submitRef.current = submit; });
 
-  const stopRecording = () => {
-    cancelAnimationFrame(rafRef.current);
-    audioCtxRef.current?.close();
-    audioCtxRef.current = null;
-    mediaRecorderRef.current?.stop();
-  };
-
-  const startRecording = async (ptt = false) => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm") ? "audio/webm" : "audio/mp4";
-      const recorder = new MediaRecorder(stream, { mimeType });
-      const chunks: BlobPart[] = [];
-
-      if (!ptt) {
-        const audioCtx = new AudioContext();
-        audioCtxRef.current = audioCtx;
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        audioCtx.createMediaStreamSource(stream).connect(analyser);
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        let silenceStart: number | null = null;
-        const startedAt = Date.now();
-        const tick = () => {
-          if (recorder.state !== "recording") return;
-          analyser.getByteTimeDomainData(data);
-          let sum = 0;
-          for (const v of data) { const n = (v - 128) / 128; sum += n * n; }
-          const rms = Math.sqrt(sum / data.length);
-          if (Date.now() - startedAt > 700 && rms < 0.015) {
-            silenceStart ??= Date.now();
-            if (Date.now() - silenceStart > 1500) { stopRecording(); return; }
-          } else if (rms >= 0.015) { silenceStart = null; }
-          rafRef.current = requestAnimationFrame(tick);
-        };
-        rafRef.current = requestAnimationFrame(tick);
-      }
-
-      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        setMicState("transcribing");
-        const blob = new Blob(chunks, { type: mimeType });
-        const ext = mimeType.includes("mp4") ? "mp4" : "webm";
-        try {
-          const fd = new FormData();
-          fd.append("file", blob, `recording.${ext}`);
-          const res = await fetch("/api/transcribe", { method: "POST", body: fd });
-          const json = await res.json();
-          if (json.transcript?.trim()) await submitRef.current(json.transcript);
-        } catch (err) {
-          console.error("Transcription error:", err);
-        } finally {
-          setMicState("idle");
-        }
-      };
-
-      recorder.start();
-      mediaRecorderRef.current = recorder;
-      setMicState("listening");
-    } catch (err) {
-      console.error("Mic error:", err);
-    }
-  };
-
-  const startRecordingRef = useRef(startRecording);
-  useEffect(() => { startRecordingRef.current = startRecording; });
-
-  useEffect(() => {
-    const onDown = (e: globalThis.KeyboardEvent) => {
-      if (e.code === "Backquote" && !e.repeat && micStateRef.current === "idle" && !streamingRef.current) {
-        e.preventDefault();
-        startRecordingRef.current(true);
-      }
-    };
-    const onUp = (e: globalThis.KeyboardEvent) => {
-      if (e.code === "Backquote" && micStateRef.current === "listening") {
-        e.preventDefault();
-        stopRecording();
-      }
-    };
-    window.addEventListener("keydown", onDown, { capture: true });
-    window.addEventListener("keyup", onUp, { capture: true });
-    return () => {
-      window.removeEventListener("keydown", onDown, { capture: true });
-      window.removeEventListener("keyup", onUp, { capture: true });
-    };
-  }, []);
-
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent) => {
       if (document.activeElement === textareaRef.current) return;
@@ -384,12 +288,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  const toggleMic = () => {
-    if (streaming || micState === "transcribing") return;
-    if (micState === "listening") { stopRecording(); return; }
-    startRecording(false);
-  };
 
   const [promptSending, setPromptSending] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
@@ -429,20 +327,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   const inputRow = (
     <div className="flex items-center gap-5">
-      <button
-        onClick={toggleMic}
-        disabled={streaming || micState === "transcribing"}
-        aria-label={micState === "listening" ? "Stop" : "Record"}
-        className="shrink-0 disabled:opacity-30 transition-opacity"
-      >
-        {micState === "listening" ? (
-          <span className="inline-block w-3 h-3 rounded-full bg-red-400 animate-pulse" />
-        ) : micState === "transcribing" ? (
-          <span className="inline-block w-3 h-3 rounded-full bg-[#C8C4BE] animate-pulse" />
-        ) : (
-          <MicIcon className="text-[#C8C4BE] hover:text-[#9C9890] transition-colors" />
-        )}
-      </button>
       <div className="relative flex-1">
         {/* Shadow div — always in flow, mirrors textarea content to set height */}
         <div
@@ -617,12 +501,3 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   );
 }
 
-function MicIcon({ className }: { className?: string }) {
-  return (
-    <svg width="16" height="21" viewBox="0 0 12 16" fill="none" className={className}>
-      <rect x="3" y="0.5" width="6" height="9" rx="3" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M1 8C1 11.31 3.24 13.5 6 13.5C8.76 13.5 11 11.31 11 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="6" y1="13.5" x2="6" y2="15.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
