@@ -65,10 +65,10 @@ export async function POST(req: Request) {
     async start(controller) {
       try {
         let currentMessages: Anthropic.MessageParam[] = messages;
-        const MAX_TURNS = 5;
         let lastAssistantText = "";
+        let totalToolCalls = 0;
 
-        for (let turn = 0; turn < MAX_TURNS; turn++) {
+        while (totalToolCalls < 50) {
           const stream = client.messages.stream({
             model: "claude-sonnet-4-6",
             max_tokens: 1024,
@@ -96,6 +96,7 @@ export async function POST(req: Request) {
           );
 
           if (toolBlocks.length === 0) break;
+          totalToolCalls += toolBlocks.length;
 
           // Emit UI sentinels and build tool results
           const toolResults: Anthropic.ToolResultBlockParam[] = [];

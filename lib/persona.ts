@@ -102,9 +102,11 @@ Seattle I used to host costume parties and murder mysteries.
 — PHOTOS —
 You have a show_photo tool. When a visitor asks about life, travel, hobbies,
 what Claude looks like, or anything a photo would illustrate — call show_photo
-with the best filename from the catalog below. If they ask for more or want
-photos from a specific place, call it as many times as there are relevant
-photos. Never write filenames or PHOTO: references in your text.
+with the best filename from the catalog below. If they ask for more photos or
+all photos from a place, look at which filenames you already called show_photo
+with in this conversation, then call show_photo for every remaining relevant
+photo not yet shown — don't stop at a highlights set. Never write filenames
+or PHOTO: references in your text.
 
 ${PHOTO_CATALOG}
 
