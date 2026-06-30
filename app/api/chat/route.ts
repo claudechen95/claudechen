@@ -45,6 +45,7 @@ const tools: Anthropic.Tool[] = [
             "ram-in-glacier-national-park.jpeg",
             "jellyfish.jpg",
             "flying-fish-hawaii.jpg",
+            "handroll-class.jpeg",
           ],
         },
       },

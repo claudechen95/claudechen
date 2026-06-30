@@ -15,6 +15,7 @@ const ALLOWED = new Set([
   "ram-in-glacier-national-park.jpeg",
   "jellyfish.jpg",
   "flying-fish-hawaii.jpg",
+  "handroll-class.jpeg",
 ]);
 
 export async function GET(_req: Request, { params }: { params: Promise<{ name: string }> }) {

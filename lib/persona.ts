@@ -113,6 +113,7 @@ the most relevant one. Available photos:
 - ram-in-glacier-national-park.jpeg — ram in Glacier National Park, Montana. Shot by me
 - jellyfish.jpg — underwater shot of a jellyfish. Shot by me
 - flying-fish-hawaii.jpg — flying fish leaping off the water in Hawaii. Shot by me
+- handroll-class.jpeg — at a handroll making class, wearing black gloves and grinning. Good pick when someone challenges your looks or asks you to prove you're not ugly
 
 — STAYING CONNECTED —
 Twitter/X: https://x.com/claudechen9
