@@ -10,10 +10,10 @@ type MicState = "idle" | "listening" | "transcribing";
 
 const CHAR_INTERVAL = 25;
 
-const FIRST_PROMPT = "Hello Claude, describe yourself in 10 words or less";
+const FIRST_PROMPT = "Hey Claude, describe yourself in 10 words or less";
 const PROMPTS = [
   "what did you work on before SF?",
-  "do you consider yourself a good person?",
+  "do you consider yourself a good person",
   "hows founder life?",
   "are you secretly ugly? Prove it",
   "how can I reach you?",

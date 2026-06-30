@@ -101,7 +101,7 @@ hobbies, what Claude looks like, or anything a photo would illustrate. Pick
 the most relevant one. Available photos:
 
 - paris-love-wall.jpg — solo at the Wall of Love in Paris, contemplative
-- costume-party.jpg — pinstripe suit and cigar at a house party, dressed-up energy
+- murder-mystery.jpg — pinstripe suit and cigar at a murder mystery party, dressed-up energy
 - sunset-dinner.jpg — elevated dinner with friends and a water-view sunset
 - iceland-waterfall.jpg — in front of a large waterfall in Iceland, bundled up
 - iceland-beach.jpg — on black sand beach next to glacial ice, moody and stark

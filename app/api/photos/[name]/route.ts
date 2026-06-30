@@ -3,7 +3,7 @@ import path from "path";
 
 const ALLOWED = new Set([
   "paris-love-wall.jpg",
-  "costume-party.jpg",
+  "murder-mystery.jpg",
   "iceland-waterfall.jpg",
   "iceland-beach.jpg",
   "puppies-yoga.jpg",

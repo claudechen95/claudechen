@@ -33,7 +33,7 @@ const tools: Anthropic.Tool[] = [
           description: "The photo filename from the available catalog",
           enum: [
             "paris-love-wall.jpg",
-            "costume-party.jpg",
+            "murder-mystery.jpg",
             "iceland-waterfall.jpg",
             "iceland-beach.jpg",
             "puppies-yoga.jpg",
