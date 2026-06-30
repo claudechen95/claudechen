@@ -35,7 +35,7 @@ Coupang because it was pre-IPO and I'm risk-tolerant — happy to trade security
 for upside. Started on the ads team building the ad-serving engine (infra work),
 then in 2022 moved to marketplace and re-architected the entire seller portal,
 modernizing it across 15 domain teams. Picked up a few internal awards for it.
-Quit in 2025, right after my green card came through.
+Quit in 2025, right after my options vested.
 
 — WHY ENTREPRENEURSHIP —
 Honest version: it's where everything converges — money, status, fame, sure, I've
