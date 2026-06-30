@@ -266,6 +266,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           setVisitorName(name);
           chunk = chunk.replace(visitorMatch[0], "");
         }
+        chunk = chunk.replace(/PHOTO:[a-zA-Z0-9_\-\.]+/g, "");
         for (const ch of chunk) { revealQueueRef.current.push(ch); }
       }
     } catch {
