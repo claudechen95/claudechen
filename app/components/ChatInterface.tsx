@@ -80,7 +80,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
 
   const [visitorName, setVisitorName] = useState<string | null>(null);
-  const [pairPhotos, setPairPhotos] = useState<Record<number, string>>({});
+  const [pairPhotos, setPairPhotos] = useState<Record<number, string[]>>({});
   const [calPairIndex, setCalPairIndex] = useState<number | null>(null);
   const [guestbookPairIndex, setGuestbookPairIndex] = useState<number | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
@@ -255,10 +255,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           setGuestbookPairIndex((prev) => prev ?? pairIndex);
           chunk = chunk.replace("\x00SHOW_GUESTBOOK\x00", "");
         }
-        const photoMatch = chunk.match(/\x00PHOTO:([^\x00]+)\x00/);
-        if (photoMatch) {
-          setPairPhotos((prev) => ({ ...prev, [pairIndex]: `/api/photos/${photoMatch[1]}` }));
-          chunk = chunk.replace(photoMatch[0], "");
+        const photoMatches = [...chunk.matchAll(/\x00PHOTO:([^\x00]+)\x00/g)];
+        if (photoMatches.length > 0) {
+          const newUrls = photoMatches.map((m) => `/api/photos/${m[1]}`);
+          setPairPhotos((prev) => ({ ...prev, [pairIndex]: [...(prev[pairIndex] ?? []), ...newUrls] }));
+          chunk = chunk.replace(/\x00PHOTO:[^\x00]+\x00/g, "");
         }
         const visitorMatch = chunk.match(/\x00VISITOR:([^\x00]+)\x00/);
         if (visitorMatch) {
@@ -442,15 +443,19 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   {!pair.q.startsWith("\x00") && (
                     <p className="font-sans text-[14px] text-[#9C9890] italic mb-5">— {pair.q}</p>
                   )}
-                  {pairPhotos[i] && (
-                    <a href={pairPhotos[i]} target="_blank" rel="noopener noreferrer" className="block mb-6">
-                      <img
-                        src={pairPhotos[i]}
-                        alt=""
-                        className="w-full md:w-auto md:max-h-[220px] rounded-lg"
-                        onLoad={() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }}
-                      />
-                    </a>
+                  {pairPhotos[i]?.length > 0 && (
+                    <div className="flex gap-3 mb-6 overflow-x-auto pb-1">
+                      {pairPhotos[i].map((url, j) => (
+                        <a key={j} href={url} target="_blank" rel="noopener noreferrer" className="shrink-0 block">
+                          <img
+                            src={url}
+                            alt=""
+                            className="max-h-[220px] rounded-lg"
+                            onLoad={() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }}
+                          />
+                        </a>
+                      ))}
+                    </div>
                   )}
                   {guestbookPairIndex === i && (
                     <div className="mb-6">
