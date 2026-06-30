@@ -13,11 +13,11 @@ const CHAR_INTERVAL = 25;
 const FIRST_PROMPT = "Hello Claude, describe yourself in 10 words or less";
 const PROMPTS = [
   "what did you work on before SF?",
-  "are you a good or bad person?",
+  "do you consider yourself a good person?",
   "hows founder life?",
   "are you secretly ugly? Prove it",
   "how can I reach you?",
-  "schedule a meeting",
+  "Let's meet",
   "sign the guest book",
 ];
 
