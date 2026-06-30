@@ -17,13 +17,28 @@ export const PHOTOS: Photo[] = [
   { filename: "iceland-reynisfjara.jpg", description: "Reynisfjara black sand beach with dramatic basalt sea stacks, overcast — Iceland landscape photography" },
   { filename: "iceland-jokulsarlon.jpg", description: "Jökulsárlón glacier lagoon with floating icebergs under a grey sky — Iceland" },
   { filename: "iceland-svartifoss.jpg", description: "Svartifoss waterfall framed by hexagonal basalt columns — signature Iceland shot" },
-  { filename: "iceland-seljalandsfoss.jpg", description: "Seljalandsfoss waterfall cascading from a cliff, green hillside — Iceland" },
+  { filename: "iceland-seljalandsfoss.jpg", description: "Seljalandsfoss waterfall cascading from a tall cliff, green hillside — Iceland" },
   { filename: "iceland-thingvellir-overlook.jpg", description: "Þingvellir national park wide view, river winding through green valley to a lake — Iceland Golden Circle" },
   { filename: "iceland-thingvellir-rift.jpg", description: "Þingvellir tectonic rift canyon, people walking the path between continental plates — Iceland" },
   { filename: "iceland-lava.jpg", description: "glowing molten lava dripping and pooling in darkness — Iceland volcanic eruption, shot at night" },
 
-  // travel — egypt
+  // travel — egypt (land)
   { filename: "pyramids.jpg", description: "selfie in front of the Great Pyramids of Giza" },
+  { filename: "egypt-camel.jpg", description: "riding a camel at dusk near the pyramids — Egypt" },
+  { filename: "egypt-luxor-temple.jpg", description: "Luxor Temple massive columns lit up at night, dramatic uplighting — Egypt" },
+  { filename: "egypt-hot-air-balloons.jpg", description: "flock of hot air balloons floating over Luxor at dawn, shot from another balloon — Egypt" },
+  { filename: "egypt-temple-hieroglyphs.jpg", description: "looking up at hieroglyphic-covered ceiling and walls inside an ancient Egyptian temple — moody and dark" },
+
+  // travel — egypt (red sea diving)
+  { filename: "egypt-red-sea-reef.jpg", description: "coral reef exploding with hundreds of orange fish, brilliant blue water — Red Sea diving, Egypt" },
+  { filename: "egypt-diving-cave.jpg", description: "scuba diver silhouetted passing through an underwater cave arch, electric blue — Red Sea" },
+  { filename: "egypt-dolphin.jpg", description: "spinner dolphin gliding underwater just below the surface — Red Sea" },
+  { filename: "egypt-scorpionfish.jpg", description: "scorpionfish face close-up, camouflaged in coral — Red Sea macro diving" },
+  { filename: "egypt-banded-shrimp.jpg", description: "banded coral shrimp with long white antennae, vivid red and blue — Red Sea" },
+  { filename: "egypt-shrimp-anemone.jpg", description: "tiny transparent shrimp on anemone tentacles, extreme macro — Red Sea" },
+  { filename: "egypt-nudibranch.jpg", description: "black and white nudibranch on coral — Red Sea macro diving" },
+  { filename: "egypt-starfish.jpg", description: "large deep-red starfish on a coral reef — Red Sea" },
+  { filename: "egypt-fish-coral.jpg", description: "small fish peeking out of a hole in coral — Red Sea" },
 
   // travel — costa rica
   { filename: "costa-rica-rio-celeste.jpg", description: "Rio Celeste waterfall, electric turquoise pool in dense jungle — Costa Rica" },

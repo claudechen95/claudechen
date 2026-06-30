@@ -1,22 +1,8 @@
 import { readFile } from "fs/promises";
 import path from "path";
+import { PHOTO_FILENAMES } from "@/lib/photos";
 
-const ALLOWED = new Set([
-  "paris-love-wall.jpg",
-  "murder-mystery.jpg",
-  "iceland-waterfall.jpg",
-  "iceland-beach.jpg",
-  "puppies-yoga.jpg",
-  "bar-friends.jpg",
-  "sunset-dinner.jpg",
-  "sculpting_photo.jpg",
-  "pyramids.jpg",
-  "dog.jpg",
-  "ram-in-glacier-national-park.jpeg",
-  "jellyfish.jpg",
-  "flying-fish-hawaii.jpg",
-  "handroll-class.jpeg",
-]);
+const ALLOWED = new Set(PHOTO_FILENAMES);
 
 export async function GET(_req: Request, { params }: { params: Promise<{ name: string }> }) {
   const { name } = await params;

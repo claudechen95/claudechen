@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Redis } from "@upstash/redis";
 import { SYSTEM_PROMPT } from "@/lib/persona";
+import { PHOTOS } from "@/lib/photos";
 
 const client = new Anthropic();
 const kv = new Redis({
@@ -22,31 +23,21 @@ const tools: Anthropic.Tool[] = [
     input_schema: { type: "object" as const, properties: {}, required: [] },
   },
   {
+    name: "list_photos",
+    description:
+      "Browse the available photo catalog. Call this first before show_photo to find the best filename for the visitor's request.",
+    input_schema: { type: "object" as const, properties: {}, required: [] },
+  },
+  {
     name: "show_photo",
     description:
-      "Display a photo of Claude inline in the conversation. Use when a visitor asks about his life, travels, hobbies, appearance, or anything a photo would answer better than words.",
+      "Display a photo of Claude inline in the conversation. Call list_photos first to get the catalog, then call this once with the best matching filename.",
     input_schema: {
       type: "object" as const,
       properties: {
         filename: {
           type: "string",
-          description: "The photo filename from the available catalog",
-          enum: [
-            "paris-love-wall.jpg",
-            "murder-mystery.jpg",
-            "iceland-waterfall.jpg",
-            "iceland-beach.jpg",
-            "puppies-yoga.jpg",
-            "bar-friends.jpg",
-            "sunset-dinner.jpg",
-            "sculpting_photo.jpg",
-            "pyramids.jpg",
-            "dog.jpg",
-            "ram-in-glacier-national-park.jpeg",
-            "jellyfish.jpg",
-            "flying-fish-hawaii.jpg",
-            "handroll-class.jpeg",
-          ],
+          description: "The photo filename from the catalog returned by list_photos",
         },
       },
       required: ["filename"],
@@ -117,6 +108,10 @@ export async function POST(req: Request) {
           for (const block of toolBlocks) {
             const input = block.input as Record<string, string>;
             let result = "done";
+
+            if (block.name === "list_photos") {
+              result = JSON.stringify(PHOTOS);
+            }
 
             if (block.name === "show_guestbook") {
               controller.enqueue(encoder.encode("\x00SHOW_GUESTBOOK\x00"));
