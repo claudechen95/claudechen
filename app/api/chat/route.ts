@@ -34,7 +34,6 @@ const tools: Anthropic.Tool[] = [
           enum: [
             "paris-love-wall.jpg",
             "costume-party.jpg",
-            "coastal-selfie.jpg",
             "iceland-waterfall.jpg",
             "iceland-beach.jpg",
             "puppies-yoga.jpg",
