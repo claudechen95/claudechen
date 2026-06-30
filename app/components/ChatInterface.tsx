@@ -27,7 +27,7 @@ function pickUnusedPrompt(exclude: Set<string>): string | null {
   return unused[Math.floor(Math.random() * unused.length)];
 }
 
-const MD_LINK_RE = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+const MD_LINK_RE = /\[([^\]]+)\]\(((?:https?|mailto):[^)]+)\)/g;
 const URL_RE = /(https?:\/\/[^\s]+|(?<![/@\w])[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/g;
 
 function renderWithLinks(text: string) {
@@ -266,7 +266,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           setVisitorName(name);
           chunk = chunk.replace(visitorMatch[0], "");
         }
-        chunk = chunk.replace(/PHOTO:[a-zA-Z0-9_\-\.]+/g, "");
+        chunk = chunk.replace(/PHOTO:[a-zA-Z0-9_\-\.]+/g, " ");
         for (const ch of chunk) { revealQueueRef.current.push(ch); }
       }
     } catch {
