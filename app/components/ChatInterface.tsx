@@ -16,7 +16,6 @@ const PROMPTS = [
   "hows founder life?",
   "are you secretly ugly? Prove it",
   "how can I reach you?",
-  "have you been outside of the country",
   "Let's meet",
   "sign the guest book",
 ];
