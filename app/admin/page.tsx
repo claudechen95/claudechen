@@ -78,7 +78,7 @@ export default async function AdminPage({
               (m) => !m.content.startsWith("\x00") && m.content.trim()
             );
             const userMsgCount = visible.filter((m) => m.role === "user").length;
-            const location = [conv.city, conv.country].filter(Boolean).join(", ");
+            const location = [conv.city ? decodeURIComponent(conv.city) : null, conv.country].filter(Boolean).join(", ");
             const device = parseUA(conv.ua);
             return (
               <div key={conv.sessionId}>
