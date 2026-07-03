@@ -11,6 +11,38 @@ interface SavedConv {
   visitorName: string | null;
   messages: Array<{ role: string; content: string }>;
   updatedAt: string;
+  ip?: string | null;
+  country?: string | null;
+  city?: string | null;
+  region?: string | null;
+  ua?: string | null;
+}
+
+function parseUA(ua: string | null | undefined): string | null {
+  if (!ua) return null;
+  const browser = ua.includes("Edg/")
+    ? "Edge"
+    : ua.includes("Chrome/")
+    ? "Chrome"
+    : ua.includes("Firefox/")
+    ? "Firefox"
+    : ua.includes("Safari/")
+    ? "Safari"
+    : null;
+  const os = ua.includes("iPhone")
+    ? "iPhone"
+    : ua.includes("iPad")
+    ? "iPad"
+    : ua.includes("Android")
+    ? "Android"
+    : ua.includes("Mac OS X")
+    ? "Mac"
+    : ua.includes("Windows")
+    ? "Windows"
+    : ua.includes("Linux")
+    ? "Linux"
+    : null;
+  return [os, browser].filter(Boolean).join(" · ") || null;
 }
 
 function formatDate(iso: string) {
@@ -45,9 +77,12 @@ export default async function AdminPage({
             const visible = conv.messages.filter(
               (m) => !m.content.startsWith("\x00") && m.content.trim()
             );
+            const userMsgCount = visible.filter((m) => m.role === "user").length;
+            const location = [conv.city, conv.country].filter(Boolean).join(", ");
+            const device = parseUA(conv.ua);
             return (
               <div key={conv.sessionId}>
-                <div className="flex items-baseline gap-4 mb-5">
+                <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-5">
                   <span className="font-sans text-[11px] text-[#C8C4BE]">
                     {formatDate(conv.updatedAt)}
                   </span>
@@ -56,6 +91,19 @@ export default async function AdminPage({
                       {conv.visitorName}
                     </span>
                   )}
+                  {location && (
+                    <span className="font-sans text-[11px] text-[#9C9890]">
+                      {location}
+                    </span>
+                  )}
+                  {device && (
+                    <span className="font-sans text-[11px] text-[#9C9890]">
+                      {device}
+                    </span>
+                  )}
+                  <span className="font-sans text-[11px] text-[#C8C4BE]">
+                    {userMsgCount}q
+                  </span>
                   <span className="font-sans text-[11px] text-[#C8C4BE]">
                     {conv.sessionId}
                   </span>

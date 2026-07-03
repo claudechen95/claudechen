@@ -53,6 +53,15 @@ const tools: Anthropic.Tool[] = [
 ];
 
 export async function POST(req: Request) {
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+    req.headers.get("x-real-ip") ??
+    null;
+  const country = req.headers.get("x-vercel-ip-country") ?? null;
+  const city = req.headers.get("x-vercel-ip-city") ?? null;
+  const region = req.headers.get("x-vercel-ip-country-region") ?? null;
+  const ua = req.headers.get("user-agent") ?? null;
+
   const { messages, visitorName, sessionId } = await req.json();
 
   const system = visitorName
@@ -149,6 +158,11 @@ toolResults.push({
               visitorName: visitorName ?? null,
               messages: toSave,
               updatedAt: new Date().toISOString(),
+              ip,
+              country,
+              city,
+              region,
+              ua,
             });
             await kv.zadd("conv_index", { score: Date.now(), member: sessionId });
           } catch (e) {
