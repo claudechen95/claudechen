@@ -508,8 +508,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           }}
           disabled={streaming || !!input.trim()}
           className={[
-            "absolute left-1 md:left-3 top-1/2 -translate-y-1/2 font-sans text-[11px] transition-colors",
-            streaming || input.trim() ? "invisible" : "text-[#9C9890] hover:text-[#1B1B19] active:text-[#1B1B19]",
+            "absolute left-1 md:left-3 top-1/2 -translate-y-1/2 font-sans text-[15px] transition-colors",
+            streaming || input.trim() ? "invisible" : "text-[#6B6760] hover:text-[#1B1B19] active:text-[#1B1B19]",
           ].join(" ")}
         >
           ✦
