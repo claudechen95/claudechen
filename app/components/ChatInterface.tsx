@@ -9,13 +9,13 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
-const FIRST_PROMPT = "Hey Claude, describe yourself in 10 words or less";
+const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
-  "were you jobless before SF?",
-  "do you consider yourself a good person",
+  "was he jobless before SF?",
+  "is Claude a good person",
   "hows founder life?",
-  "are you secretly ugly? Prove it",
-  "how can I reach you?",
+  "Is Claude secretly ugly? Prove it",
+  "how can I reach Claude?",
   "Let's meet",
   "sign the guest book",
 ];
