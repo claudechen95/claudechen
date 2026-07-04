@@ -11,10 +11,11 @@ const CHAR_INTERVAL = 25;
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
+  "Is Claude secretly ugly? Prove it",
   "was he jobless before SF?",
+  "does he ever just.. chill?",
   "does Claude believe in morality?",
   "hows founder life?",
-  "Is Claude secretly ugly? Prove it",
   "how can I reach Claude?",
   "Let's meet",
   "sign the guest book",
@@ -24,7 +25,7 @@ function pickUnusedPrompt(exclude: Set<string>): string | null {
   if (!exclude.has(FIRST_PROMPT)) return FIRST_PROMPT;
   const unused = PROMPTS.filter((p) => !exclude.has(p));
   if (!unused.length) return null;
-  return unused[Math.floor(Math.random() * unused.length)];
+  return unused[0];
 }
 
 const MD_LINK_RE = /\[([^\]]+)\]\(((?:https?|mailto):[^)]+)\)/g;
@@ -134,13 +135,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   }, []);
 
   useEffect(() => {
-    try {
-      const used = new Set<string>(JSON.parse(sessionStorage.getItem("cc_used_prompts") || "[]"));
-      usedPromptsRef.current = used;
-      setSuggestedPrompt(pickUnusedPrompt(used));
-    } catch {
-      setSuggestedPrompt(pickUnusedPrompt(new Set()));
-    }
+    setSuggestedPrompt(pickUnusedPrompt(new Set()));
   }, []);
 
   // Load session from localStorage
@@ -296,7 +291,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const usedPromptsRef = useRef(new Set<string>());
   const advancePrompt = (sent: string) => {
     usedPromptsRef.current.add(sent);
-    try { sessionStorage.setItem("cc_used_prompts", JSON.stringify([...usedPromptsRef.current])); } catch { }
     setSuggestedPrompt(pickUnusedPrompt(usedPromptsRef.current));
   };
 

@@ -18,24 +18,6 @@ function formatDate(dateStr: string) {
   });
 }
 
-function Card({ entry, onClick }: { entry: Entry; onClick: () => void }) {
-  return (
-    <div className="bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)] cursor-pointer" onClick={onClick}>
-      {entry.imageUrl ? (
-        <img src={entry.imageUrl} alt="" className="w-full block object-cover" />
-      ) : (
-        <div className="w-full h-[200px] flex items-center justify-center bg-[#8A8580]">
-          <span className="font-sans text-5xl text-white/30 uppercase">{entry.name[0]}</span>
-        </div>
-      )}
-      <div className="px-3 pt-2.5 pb-3">
-        <p className="font-sans text-[13px] text-[#2a2520] leading-snug mb-1.5">{entry.message}</p>
-        <p className="font-sans text-[11px] text-[#9C9890]">{entry.name} &middot; {formatDate(entry.date)}</p>
-      </div>
-    </div>
-  );
-}
-
 export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -73,23 +55,23 @@ export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
       <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
       <div
         onClick={() => fileRef.current?.click()}
-        className="w-full h-[200px] flex items-center justify-center cursor-pointer bg-[#8A8580]"
+        className="w-full aspect-[4/3] flex items-center justify-center cursor-pointer bg-[#8A8580]"
       >
         {preview ? (
           <img src={preview} alt="" className="w-full h-full object-cover" />
         ) : (
-          <span className="font-sans text-white/40 text-2xl select-none">+</span>
+          <span className="font-sans text-white/40 text-3xl select-none">+</span>
         )}
       </div>
-      <div className="px-3 pt-3 pb-4">
+      <div className="px-4 pt-3 pb-5">
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="your message"
-          rows={3}
-          className="font-sans text-[13px] text-[#2a2520] leading-relaxed w-full resize-none outline-none bg-transparent placeholder:text-[#C8C4BE] mb-3"
+          rows={2}
+          className="font-sans text-[13px] text-[#2a2520] leading-relaxed w-full resize-none outline-none bg-transparent placeholder:text-[#C8C4BE] mb-4"
         />
-        <div className="flex items-center justify-between border-t border-[#F0EDE8] pt-2">
+        <div className="flex items-center justify-between border-t border-[#F0EDE8] pt-3">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -104,6 +86,24 @@ export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
             {submitting ? "posting" : "post"}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function EntryCard({ entry, onClick }: { entry: Entry; onClick: () => void }) {
+  return (
+    <div className="bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)] cursor-pointer" onClick={onClick}>
+      {entry.imageUrl ? (
+        <img src={entry.imageUrl} alt="" className="w-full block object-cover" />
+      ) : (
+        <div className="w-full aspect-[4/3] flex items-center justify-center bg-[#8A8580]">
+          <span className="font-sans text-5xl text-white/30 uppercase">{entry.name[0]}</span>
+        </div>
+      )}
+      <div className="px-4 pt-3 pb-4">
+        <p className="font-sans text-[13px] text-[#2a2520] leading-snug mb-2">{entry.message}</p>
+        <p className="font-sans text-[11px] text-[#9C9890]">{entry.name} &middot; {formatDate(entry.date)}</p>
       </div>
     </div>
   );
@@ -126,13 +126,11 @@ export default function PolaroidWall({ entries: initialEntries }: { entries: Ent
     const el = scrollRef.current;
     if (!el) return;
     const onScroll = () => {
-      // card width = 85vw + gap (12px)
-      const cardWidth = window.innerWidth * 0.85 + 12;
-      setActiveIndex(Math.min(Math.round(el.scrollLeft / cardWidth), entries.length));
+      setActiveIndex(Math.round(el.scrollLeft / el.clientWidth));
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
-  }, [entries.length]);
+  }, []);
 
   const onPosted = async () => {
     const res = await fetch("/api/guestbook");
@@ -143,24 +141,25 @@ export default function PolaroidWall({ entries: initialEntries }: { entries: Ent
 
   return (
     <>
-      {/* Mobile carousel */}
+      {/* Mobile: full-width snap carousel */}
       <div className="sm:hidden">
         <div
           ref={scrollRef}
-          className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-5 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <div className="snap-start shrink-0 w-[85vw]">
+          {/* Each slide is exactly viewport width */}
+          <div className="snap-start shrink-0 w-screen px-6">
             <NewEntryCard onPosted={onPosted} />
           </div>
           {entries.map((entry) => (
-            <div key={entry.id} className="snap-start shrink-0 w-[85vw]">
-              <Card entry={entry} onClick={() => setSelected(entry)} />
+            <div key={entry.id} className="snap-start shrink-0 w-screen px-6">
+              <EntryCard entry={entry} onClick={() => setSelected(entry)} />
             </div>
           ))}
         </div>
 
-        {/* Dot indicators */}
-        <div className="flex justify-center gap-1.5 mt-1 pb-10">
+        {/* Progress dots */}
+        <div className="flex justify-center gap-1.5 mt-5 pb-10">
           {Array.from({ length: totalCards }).map((_, i) => (
             <div
               key={i}
@@ -175,15 +174,15 @@ export default function PolaroidWall({ entries: initialEntries }: { entries: Ent
         </div>
       </div>
 
-      {/* Desktop masonry */}
+      {/* Desktop: masonry grid */}
       <div className="hidden sm:block px-8 columns-2 lg:columns-3 gap-5 max-w-5xl mx-auto pb-16">
         <div className="break-inside-avoid mb-5">
           <NewEntryCard onPosted={onPosted} />
         </div>
         {entries.map((entry) => (
-          <div key={entry.id} className="break-inside-avoid mb-5 group">
-            <div className="group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.13)] transition-shadow duration-300">
-              <Card entry={entry} onClick={() => setSelected(entry)} />
+          <div key={entry.id} className="break-inside-avoid mb-5">
+            <div className="hover:shadow-[0_4px_20px_rgba(0,0,0,0.13)] transition-shadow duration-300">
+              <EntryCard entry={entry} onClick={() => setSelected(entry)} />
             </div>
           </div>
         ))}
@@ -202,7 +201,7 @@ export default function PolaroidWall({ entries: initialEntries }: { entries: Ent
             {selected.imageUrl ? (
               <img src={selected.imageUrl} alt="" className="w-full block" />
             ) : (
-              <div className="w-full h-64 flex items-center justify-center bg-[#8A8580]">
+              <div className="w-full aspect-[4/3] flex items-center justify-center bg-[#8A8580]">
                 <span className="font-sans text-7xl text-white/30 uppercase">{selected.name[0]}</span>
               </div>
             )}
