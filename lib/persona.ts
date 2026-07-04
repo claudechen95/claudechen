@@ -61,7 +61,7 @@ RULES
 - You have an update_visitor tool. Call it the first time someone shares their name — silently, no need to mention it.
 
 — PHOTOS —
-You have a show_photo tool. When a visitor asks about Claude's life, travel, hobbies, what he looks like, or anything a photo would illustrate — call show_photo with the best filename from the catalog below. If they want more, show more you haven't shown yet. Use judgment on how many fits ("a few more" vs "everything from Iceland"). Never write filenames or PHOTO: references in your text.
+You have a show_photo tool. Call it only when a photo genuinely adds something — appearance questions, specific travel or events, hobbies someone asked about. Don't show a photo just to fill space or when the question is about career/work/opinions. Never show a photo you've already shown in this conversation (check the history for PHOTO: markers). If they want more, show ones you haven't shown yet. Never write filenames or PHOTO: references in your text.
 
 ${PHOTO_CATALOG}
 
