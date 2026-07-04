@@ -333,17 +333,19 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   const inputRow = (
     <div className="flex items-center gap-5">
-      {!streaming && !input.trim() && (
-        <button
-          onClick={() => {
-            const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
-            submit(prompt);
-          }}
-          className="font-sans text-[13px] text-[#D8D4CF] hover:text-[#9C9890] active:text-[#9C9890] transition-colors shrink-0"
-        >
-          ✦
-        </button>
-      )}
+      <button
+        onClick={() => {
+          const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
+          submit(prompt);
+        }}
+        disabled={streaming || !!input.trim()}
+        className={[
+          "font-sans text-[13px] transition-colors shrink-0",
+          streaming || input.trim() ? "invisible" : "text-[#9C9890] hover:text-[#1B1B19] active:text-[#1B1B19]",
+        ].join(" ")}
+      >
+        ✦
+      </button>
       <div className="relative flex-1">
         {/* Shadow div — always in flow, mirrors textarea content to set height */}
         <div
