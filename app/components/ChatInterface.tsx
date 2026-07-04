@@ -97,6 +97,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [photoModal, setPhotoModal] = useState<string | null>(null);
   const randomLuckyPos = () => ({ top: `${15 + Math.random() * 65}%`, left: `${6 + Math.random() * 82}%` });
   const [luckyPos, setLuckyPos] = useState(randomLuckyPos);
+  const usedLuckyRef = useRef(new Set<string>());
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputBarRef = useRef<HTMLDivElement>(null);
@@ -520,7 +521,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       {!streaming && (
         <button
           onClick={() => {
-            const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
+            const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
+            const pool = unused.length > 0 ? unused : LUCKY_PROMPTS;
+            if (unused.length === 0) usedLuckyRef.current.clear();
+            const prompt = pool[Math.floor(Math.random() * pool.length)];
+            usedLuckyRef.current.add(prompt);
             submit(prompt);
             setLuckyPos(randomLuckyPos());
           }}
