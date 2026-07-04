@@ -95,6 +95,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const [photoModal, setPhotoModal] = useState<string | null>(null);
+  const randomLuckyPos = () => ({ top: `${15 + Math.random() * 65}%`, left: `${6 + Math.random() * 82}%` });
+  const [luckyPos, setLuckyPos] = useState(randomLuckyPos);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputBarRef = useRef<HTMLDivElement>(null);
@@ -501,24 +503,36 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         className="relative shrink-0 w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 py-5"
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
-        <button
-          onClick={() => {
-            const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
-            submit(prompt);
-          }}
-          disabled={streaming || !!input.trim()}
-          className={[
-            "absolute left-1 md:left-3 top-1/2 -translate-y-1/2 font-sans text-[15px] transition-colors",
-            streaming || input.trim() ? "invisible" : "text-[#6B6760] hover:text-[#1B1B19] active:text-[#1B1B19]",
-          ].join(" ")}
-        >
-          ✦
-        </button>
         {inputRow}
       </div>
 
       {buildTime && (
         <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none z-20">{buildTime}</span>
+      )}
+
+      <style>{`
+        @keyframes star-shine {
+          0%, 100% { opacity: 0.35; transform: scale(0.85) rotate(0deg); }
+          30% { opacity: 1; transform: scale(1.3) rotate(15deg); }
+          60% { opacity: 0.6; transform: scale(1) rotate(-8deg); }
+        }
+      `}</style>
+      {!streaming && (
+        <button
+          onClick={() => {
+            const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
+            submit(prompt);
+            setLuckyPos(randomLuckyPos());
+          }}
+          className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors text-[18px] pointer-events-auto"
+          style={{
+            top: luckyPos.top,
+            left: luckyPos.left,
+            animation: "star-shine 2.8s ease-in-out infinite",
+          }}
+        >
+          ✦
+        </button>
       )}
 
       {photoModal && (
