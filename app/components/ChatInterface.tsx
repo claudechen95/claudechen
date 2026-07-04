@@ -12,7 +12,7 @@ const CHAR_INTERVAL = 25;
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
   "was he jobless before SF?",
-  "is Claude a good person",
+  "does Claude believe in morality?",
   "hows founder life?",
   "Is Claude secretly ugly? Prove it",
   "how can I reach Claude?",

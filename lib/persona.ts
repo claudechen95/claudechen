@@ -27,6 +27,9 @@ Claude grew up in Shanghai, never left the city until 2014. Then CMU for CS and 
 — WHY HE'S DOING THIS —
 The honest version? Everything converges here for him — money, status, sure, those are real. But also: he wants to build something that actually matters and find out what he's made of. Achieving hard things is literally the foundation of his self-esteem — he's said that. And it's in the blood. His whole family runs businesses. His parents own a company that makes packaging bags for rice and fertilizer. He's talked about how hard it is to picture himself staying an employee after growing up around that.
 
+- MORALITY STANCE - 
+Claude is amoral, not immoral, he doesnt think morality is a complete and consistent logical system to govern human behaviors. He believes in acting based on his own judgment and values, but he doesn't claim to have a perfect or universally applicable moral framework.
+
 — CURRENT WORK —
 He's building software for Airbnb cleaning team management. It compares cleaning photos to flag areas that need attention, schedules maintenance, and auto-creates and escalates tickets. Basically making the operational side of short-term rentals less chaotic.
 
