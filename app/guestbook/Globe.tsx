@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import Map, { Marker, useMap } from "react-map-gl/mapbox";
 
 const PIN_BOB_CSS = `
@@ -65,6 +66,7 @@ function PolaroidOverlay({ entry, onClose }: { entry: GeoEntry; onClose: () => v
     >
       <div
         className="bg-white w-full max-w-xs shadow-2xl"
+        style={{ padding: "8px 8px 0 8px" }}
         onClick={(e) => e.stopPropagation()}
       >
         {entry.imageUrl ? (
@@ -74,7 +76,7 @@ function PolaroidOverlay({ entry, onClose }: { entry: GeoEntry; onClose: () => v
             <span className="font-sans text-7xl text-white/30 uppercase">{entry.name[0]}</span>
           </div>
         )}
-        <div className="px-4 pt-3 pb-5">
+        <div className="px-2 pt-3 pb-8">
           <p className="font-sans text-[14px] text-[#2a2520] leading-relaxed mb-2">{entry.message}</p>
           <p className="font-sans text-[11px] text-[#9C9890]">
             {entry.name} &middot; {formatDate(entry.date)}
@@ -177,12 +179,12 @@ function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (lat:
   };
 
   const handleSubmit = async () => {
-    if (!name.trim() || !message.trim() || !photo) return;
+    if (!name.trim() || !message.trim()) return;
     setSubmitting(true);
     const fd = new FormData();
     fd.append("name", name.trim());
     fd.append("message", message.trim());
-    fd.append("image", photo);
+    if (photo) fd.append("image", photo);
     try {
       const res = await fetch("/api/guestbook", { method: "POST", body: fd });
       if (res.ok) {
@@ -200,7 +202,7 @@ function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (lat:
   return (
     <div
       className="bg-white w-full"
-      style={{ padding: "12px 12px 16px 12px", boxShadow: "0 12px 48px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)" }}
+      style={{ padding: "8px 8px 36px 8px", boxShadow: "0 12px 48px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)" }}
     >
       {/* Photo area */}
       <div
@@ -223,7 +225,7 @@ function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (lat:
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
 
       {/* Caption strip */}
-      <div className="mt-3">
+      <div className="mt-4">
         <>
             <input
               type="text"
@@ -257,12 +259,40 @@ function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (lat:
   );
 }
 
+function fanOffsets(count: number, radius = 30): [number, number][] {
+  if (count === 1) return [[0, 0]];
+  return Array.from({ length: count }, (_, i) => {
+    const angle = (2 * Math.PI * i) / count - Math.PI / 2;
+    return [Math.round(Math.cos(angle) * radius), Math.round(Math.sin(angle) * radius)];
+  });
+}
+
 export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
+  const router = useRouter();
   const [selected, setSelected] = useState<GeoEntry | null>(null);
   const [flyTarget, setFlyTarget] = useState<GeoEntry | null>(null);
   const [postFlyCoords, setPostFlyCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+
+  const entriesWithOffsets = useMemo(() => {
+    const groups = new Map<string, GeoEntry[]>();
+    entries.forEach((e) => {
+      const key = `${e.lat},${e.lng}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(e);
+    });
+    const result: { entry: GeoEntry; offset: [number, number]; delay: number }[] = [];
+    let globalIndex = 0;
+    groups.forEach((group) => {
+      const offsets = fanOffsets(group.length);
+      group.forEach((entry, i) => {
+        result.push({ entry, offset: offsets[i], delay: globalIndex * 0.4 });
+        globalIndex++;
+      });
+    });
+    return result;
+  }, [entries]);
 
   const handlePinClick = useCallback((entry: GeoEntry) => {
     setFlyTarget(entry);
@@ -304,14 +334,15 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
             "star-intensity": 0,
           }}
         >
-          {entries.map((entry, i) => (
+          {entriesWithOffsets.map(({ entry, offset, delay }) => (
             <Marker
               key={entry.id}
               longitude={entry.lng}
               latitude={entry.lat}
               anchor="bottom"
+              offset={offset}
             >
-              <PolaroidPin entry={entry} onClick={() => handlePinClick(entry)} delay={i * 0.4} />
+              <PolaroidPin entry={entry} onClick={() => handlePinClick(entry)} delay={delay} />
             </Marker>
           ))}
 
@@ -344,7 +375,10 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
           <div className="relative w-full max-w-[340px] md:max-w-[360px] my-auto">
             <EntryForm
               onClose={() => setFormOpen(false)}
-              onPosted={(lat, lng) => setPostFlyCoords({ lat, lng })}
+              onPosted={(lat, lng) => {
+                setPostFlyCoords({ lat, lng });
+                router.refresh();
+              }}
             />
           </div>
         </div>
