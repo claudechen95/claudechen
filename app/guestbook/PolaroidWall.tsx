@@ -10,15 +10,30 @@ interface Entry {
   imageUrl?: string;
 }
 
-const ROTATIONS = [-3, 1.5, -1.5, 2, -2.5, 1, -1, 2.5, -2, 3, -0.5, 1.5];
-const PHOTO_COLORS = ["#d4c8bc", "#bcccc0", "#bcc4d0", "#cebcbc", "#c8bcd0", "#d0d0bc"];
-
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
+}
+
+function Card({ entry, onClick }: { entry: Entry; onClick: () => void }) {
+  return (
+    <div className="bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)] cursor-pointer" onClick={onClick}>
+      {entry.imageUrl ? (
+        <img src={entry.imageUrl} alt="" className="w-full block object-cover" />
+      ) : (
+        <div className="w-full h-[200px] flex items-center justify-center bg-[#8A8580]">
+          <span className="font-sans text-5xl text-white/30 uppercase">{entry.name[0]}</span>
+        </div>
+      )}
+      <div className="px-3 pt-2.5 pb-3">
+        <p className="font-sans text-[13px] text-[#2a2520] leading-snug mb-1.5">{entry.message}</p>
+        <p className="font-sans text-[11px] text-[#9C9890]">{entry.name} &middot; {formatDate(entry.date)}</p>
+      </div>
+    </div>
+  );
 }
 
 export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
@@ -54,44 +69,39 @@ export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
   const ready = !!photo && message.trim().length > 0 && name.trim().length > 0;
 
   return (
-    <div className="bg-white shadow-[0_6px_30px_rgba(0,0,0,0.12)] w-[210px] md:w-[300px] p-2.5 pb-0">
+    <div className="bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)]">
       <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
-
-      {/* Photo area */}
       <div
         onClick={() => fileRef.current?.click()}
-        className="w-full h-[195px] md:h-[280px] overflow-hidden flex items-center justify-center cursor-pointer transition-colors"
-        style={{ backgroundColor: preview ? undefined : "#f0ede8", border: preview ? undefined : "2px dashed #d4c8bc" }}
+        className="w-full h-[200px] flex items-center justify-center cursor-pointer bg-[#8A8580]"
       >
         {preview ? (
           <img src={preview} alt="" className="w-full h-full object-cover" />
         ) : (
-          <span className="font-sans text-2xl text-[#c8c4be]">+</span>
+          <span className="font-sans text-white/40 text-2xl select-none">+</span>
         )}
       </div>
-
-      {/* Caption strip */}
-      <div className="px-1 pt-3 pb-5">
+      <div className="px-3 pt-3 pb-4">
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="your message..."
+          placeholder="your message"
           rows={3}
-          className="font-serif italic text-[13.5px] md:text-[16px] text-[#2a2520] leading-snug w-full resize-none outline-none bg-transparent placeholder:text-[#d4c8bc] mb-2.5"
+          className="font-sans text-[13px] text-[#2a2520] leading-relaxed w-full resize-none outline-none bg-transparent placeholder:text-[#C8C4BE] mb-3"
         />
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between border-t border-[#F0EDE8] pt-2">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="— your name"
-            className="font-sans text-[10.5px] md:text-[13px] text-[#b0a89e] outline-none bg-transparent placeholder:text-[#d4c8bc] tracking-wide min-w-0 flex-1"
+            placeholder="your name"
+            className="font-sans text-[11px] text-[#9C9890] outline-none bg-transparent placeholder:text-[#C8C4BE] min-w-0 flex-1"
           />
           <button
             onClick={submit}
             disabled={!ready || submitting}
-            className="font-sans text-[10.5px] md:text-[13px] text-[#9C9890] hover:text-[#1B1B19] disabled:text-[#d4c8bc] transition-colors shrink-0"
+            className="font-sans text-[11px] text-[#9C9890] hover:text-[#2a2520] disabled:text-[#C8C4BE] transition-colors shrink-0"
           >
-            {submitting ? "posting…" : "post"}
+            {submitting ? "posting" : "post"}
           </button>
         </div>
       </div>
@@ -102,6 +112,8 @@ export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
 export default function PolaroidWall({ entries: initialEntries }: { entries: Entry[] }) {
   const [entries, setEntries] = useState(initialEntries);
   const [selected, setSelected] = useState<Entry | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!selected) return;
@@ -110,92 +122,94 @@ export default function PolaroidWall({ entries: initialEntries }: { entries: Ent
     return () => window.removeEventListener("keydown", onKey);
   }, [selected]);
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      // card width = 85vw + gap (12px)
+      const cardWidth = window.innerWidth * 0.85 + 12;
+      setActiveIndex(Math.min(Math.round(el.scrollLeft / cardWidth), entries.length));
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [entries.length]);
+
   const onPosted = async () => {
     const res = await fetch("/api/guestbook");
     if (res.ok) setEntries(await res.json());
   };
 
+  const totalCards = entries.length + 1;
+
   return (
     <>
-      <div className="flex flex-wrap gap-10 justify-center max-w-5xl mx-auto pb-16">
-        <NewEntryCard onPosted={onPosted} />
-
-        {entries.map((entry, i) => {
-          const rotation = ROTATIONS[i % ROTATIONS.length];
-          const photoColor = PHOTO_COLORS[i % PHOTO_COLORS.length];
-
-          return (
-            <div
-              key={entry.id}
-              className="group"
-              style={{ "--rot": `${rotation}deg` } as React.CSSProperties}
-            >
-              <div
-                onClick={() => setSelected(entry)}
-                className="[transform:rotate(var(--rot))] group-hover:[transform:rotate(0deg)_scale(1.04)] transition-transform duration-300 bg-white shadow-[0_6px_30px_rgba(0,0,0,0.5)] w-[210px] p-2.5 pb-0 cursor-pointer select-none"
-              >
-                <div
-                  className="w-full h-[195px] overflow-hidden flex items-center justify-center"
-                  style={{ backgroundColor: photoColor }}
-                >
-                  {entry.imageUrl ? (
-                    <img src={entry.imageUrl} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="font-serif text-7xl text-white/30 leading-none">
-                      {entry.name[0]}
-                    </span>
-                  )}
-                </div>
-                <div className="px-1 pt-3 pb-7">
-                  <p className="font-serif italic text-[13.5px] text-[#2a2520] leading-snug line-clamp-3 mb-2.5">
-                    {entry.message}
-                  </p>
-                  <p className="font-sans text-[10.5px] text-[#b0a89e] tracking-wide">
-                    — {entry.name} · {formatDate(entry.date)}
-                  </p>
-                </div>
-              </div>
+      {/* Mobile carousel */}
+      <div className="sm:hidden">
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto snap-x snap-mandatory gap-3 px-5 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="snap-start shrink-0 w-[85vw]">
+            <NewEntryCard onPosted={onPosted} />
+          </div>
+          {entries.map((entry) => (
+            <div key={entry.id} className="snap-start shrink-0 w-[85vw]">
+              <Card entry={entry} onClick={() => setSelected(entry)} />
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-1.5 mt-1 pb-10">
+          {Array.from({ length: totalCards }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all duration-200"
+              style={{
+                width: i === activeIndex ? 16 : 6,
+                height: 6,
+                backgroundColor: i === activeIndex ? "#2a2520" : "#D4CFC9",
+              }}
+            />
+          ))}
+        </div>
       </div>
 
+      {/* Desktop masonry */}
+      <div className="hidden sm:block px-8 columns-2 lg:columns-3 gap-5 max-w-5xl mx-auto pb-16">
+        <div className="break-inside-avoid mb-5">
+          <NewEntryCard onPosted={onPosted} />
+        </div>
+        {entries.map((entry) => (
+          <div key={entry.id} className="break-inside-avoid mb-5 group">
+            <div className="group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.13)] transition-shadow duration-300">
+              <Card entry={entry} onClick={() => setSelected(entry)} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Lightbox */}
       {selected && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6"
           onClick={() => setSelected(null)}
         >
           <div
-            className="bg-white shadow-2xl p-3 pb-0 w-full max-w-sm animate-fade-slide-up"
+            className="bg-white w-full max-w-sm shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {(() => {
-              const photoColor = PHOTO_COLORS[entries.indexOf(selected) % PHOTO_COLORS.length];
-              return (
-                <>
-                  <div
-                    className="w-full overflow-hidden flex items-center justify-center"
-                    style={{ backgroundColor: photoColor, minHeight: 280 }}
-                  >
-                    {selected.imageUrl ? (
-                      <img src={selected.imageUrl} alt="" className="w-full object-cover" />
-                    ) : (
-                      <span className="font-serif text-9xl text-white/30 leading-none py-10">
-                        {selected.name[0]}
-                      </span>
-                    )}
-                  </div>
-                  <div className="px-1 pt-4 pb-8">
-                    <p className="font-serif italic text-[17px] text-[#2a2520] leading-relaxed mb-3">
-                      {selected.message}
-                    </p>
-                    <p className="font-sans text-[12px] text-[#b0a89e] tracking-wide">
-                      — {selected.name} · {formatDate(selected.date)}
-                    </p>
-                  </div>
-                </>
-              );
-            })()}
+            {selected.imageUrl ? (
+              <img src={selected.imageUrl} alt="" className="w-full block" />
+            ) : (
+              <div className="w-full h-64 flex items-center justify-center bg-[#8A8580]">
+                <span className="font-sans text-7xl text-white/30 uppercase">{selected.name[0]}</span>
+              </div>
+            )}
+            <div className="px-4 pt-3.5 pb-5">
+              <p className="font-sans text-[14px] text-[#2a2520] leading-relaxed mb-2">{selected.message}</p>
+              <p className="font-sans text-[11px] text-[#9C9890]">{selected.name} &middot; {formatDate(selected.date)}</p>
+            </div>
           </div>
         </div>
       )}

@@ -21,8 +21,8 @@ export default async function GuestbookPage() {
   const entries = await kv.lrange<Entry>("guestbook", 0, -1);
 
   return (
-    <div className="min-h-screen bg-[#F8F7F3] px-8 py-12">
-      <div className="flex items-baseline justify-between mb-16 max-w-5xl mx-auto">
+    <div className="min-h-screen bg-[#F8F7F3] pt-12">
+      <div className="px-8 flex items-baseline justify-between mb-12 max-w-5xl mx-auto">
         <h1 className="font-sans text-[13px] text-[#9C9890]">guest book</h1>
         <BackButton />
       </div>
