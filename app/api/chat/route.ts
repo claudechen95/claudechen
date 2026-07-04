@@ -9,7 +9,8 @@ const kv = new Redis({
   token: process.env.personalwebsite_KV_REST_API_TOKEN!,
 });
 
-const tools: Anthropic.Tool[] = [
+function buildTools(availablePhotos: string[]): Anthropic.Tool[] {
+  return [
   {
     name: "show_guestbook",
     description:
@@ -32,7 +33,7 @@ const tools: Anthropic.Tool[] = [
         filename: {
           type: "string",
           description: "The photo filename from the catalog in the system prompt",
-          enum: PHOTO_FILENAMES,
+          enum: availablePhotos,
         },
       },
       required: ["filename"],
@@ -50,7 +51,8 @@ const tools: Anthropic.Tool[] = [
       required: ["name"],
     },
   },
-];
+  ];
+}
 
 export async function POST(req: Request) {
   const ip =
@@ -62,7 +64,10 @@ export async function POST(req: Request) {
   const region = req.headers.get("x-vercel-ip-country-region") ?? null;
   const ua = req.headers.get("user-agent") ?? null;
 
-  const { messages, visitorName, sessionId } = await req.json();
+  const { messages, visitorName, sessionId, shownPhotos } = await req.json();
+
+  const shownSet = new Set<string>(Array.isArray(shownPhotos) ? shownPhotos : []);
+  const availablePhotos = PHOTO_FILENAMES.filter((f) => !shownSet.has(f));
 
   const system = visitorName
     ? `${SYSTEM_PROMPT}\n\n— RETURNING VISITOR —\nThis visitor's name is ${visitorName}. Use it naturally.`
@@ -82,7 +87,7 @@ export async function POST(req: Request) {
             model: "claude-sonnet-4-6",
             max_tokens: 1024,
             system,
-            tools,
+            tools: buildTools(availablePhotos),
             messages: currentMessages,
           });
 

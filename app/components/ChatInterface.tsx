@@ -13,7 +13,7 @@ const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
   "Is Claude secretly ugly? Prove it",
   "was he jobless before SF?",
-  "does he ever just.. chill?",
+  "Hmm not sure about this guy..",
   "does Claude believe in morality?",
   "hows founder life?",
   "how can I reach Claude?",
@@ -227,10 +227,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     try {
       posthog?.capture("question_asked", { question: q });
 
+      const shownPhotos = Object.values(pairPhotos).flat().map((url) => url.replace("/api/photos/", ""));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history, visitorName: sessionIdRef.current ? visitorName : null, sessionId: currentSessionId }),
+        body: JSON.stringify({ messages: history, visitorName: sessionIdRef.current ? visitorName : null, sessionId: currentSessionId, shownPhotos }),
       });
 
       if (!res.ok || !res.body) throw new Error();
