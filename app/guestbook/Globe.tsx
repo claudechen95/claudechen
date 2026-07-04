@@ -136,8 +136,20 @@ function EntryForm({ onClose }: { onClose: () => void }) {
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    setPhoto(f);
     setPreview(URL.createObjectURL(f));
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1200;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        if (blob) setPhoto(new File([blob], f.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+      }, "image/jpeg", 0.85);
+    };
+    img.src = URL.createObjectURL(f);
   };
 
   const handleSubmit = async () => {
@@ -165,8 +177,8 @@ function EntryForm({ onClose }: { onClose: () => void }) {
       {/* Photo area */}
       <div
         onClick={() => !done && fileRef.current?.click()}
-        className="w-full overflow-hidden flex flex-col items-center justify-center bg-[#D8D4CF] cursor-pointer relative"
-        style={{ aspectRatio: preview ? undefined : "1 / 1" }}
+        className="w-full flex flex-col items-center justify-center bg-[#D8D4CF] cursor-pointer relative overflow-y-auto"
+        style={{ aspectRatio: preview ? undefined : "1 / 1", maxHeight: 320 }}
       >
         {preview ? (
           <img src={preview} alt="" className="w-full h-auto block" />
@@ -205,6 +217,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="font-sans text-[14px] text-[#1B1B19] placeholder-[#C8C4BE] bg-transparent outline-none w-full font-medium"
+              style={{ fontSize: 16 }}
             />
             <div className="flex items-end justify-between gap-2 mt-1">
               <textarea
@@ -213,6 +226,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
                 onChange={(e) => setMessage(e.target.value)}
                 rows={2}
                 className="font-sans text-[12px] text-[#6B6760] placeholder-[#C8C4BE] bg-transparent outline-none flex-1 resize-none leading-relaxed"
+                style={{ fontSize: 16 }}
               />
               <button
                 onClick={handleSubmit}
@@ -308,9 +322,9 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
 
       {/* Centered modal */}
       {formOpen && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center p-8">
+        <div className="fixed inset-0 z-30 flex items-start justify-center p-8 overflow-y-auto">
           <div className="absolute inset-0" onClick={() => setFormOpen(false)} />
-          <div className="relative w-full max-w-[340px] md:max-w-[360px]">
+          <div className="relative w-full max-w-[340px] md:max-w-[360px] my-auto">
             <EntryForm onClose={() => setFormOpen(false)} />
           </div>
         </div>
