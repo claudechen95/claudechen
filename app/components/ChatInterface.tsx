@@ -86,6 +86,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [guestbookPairIndex, setGuestbookPairIndex] = useState<number | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
+  const [photoModal, setPhotoModal] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputBarRef = useRef<HTMLDivElement>(null);
@@ -440,14 +441,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                   {pairPhotos[i]?.length > 0 && (
                     <div className="flex gap-3 mb-6 overflow-x-auto pb-1">
                       {pairPhotos[i].map((url, j) => (
-                        <a key={j} href={url} target="_blank" rel="noopener noreferrer" className="shrink-0 block">
+                        <button key={j} onClick={() => setPhotoModal(url)} className="shrink-0 block cursor-zoom-in">
                           <img
                             src={url}
                             alt=""
                             className="max-h-[220px] rounded-lg"
                             onLoad={() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }}
                           />
-                        </a>
+                        </button>
                       ))}
                     </div>
                   )}
@@ -496,6 +497,20 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
       {buildTime && (
         <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none z-20">{buildTime}</span>
+      )}
+
+      {photoModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
+          onClick={() => setPhotoModal(null)}
+        >
+          <img
+            src={photoModal}
+            alt=""
+            className="max-w-full max-h-full object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
       )}
     </div>
   );

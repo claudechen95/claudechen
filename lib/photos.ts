@@ -4,9 +4,9 @@ export const PHOTOS: Photo[] = [
   // portraits / personal
   { filename: "paris-love-wall.jpg", description: "solo at the Wall of Love in Paris, contemplative" },
   { filename: "murder-mystery.jpg", description: "pinstripe suit and cigar at a murder mystery party, dressed-up energy" },
-  { filename: "handroll-class.jpeg", description: "at a handroll making class, wearing black gloves and grinning — good pick when someone challenges your looks" },
+  { filename: "handroll-class.jpeg", description: "at a handroll making class, wearing black gloves and grinning" },
   { filename: "puppies-yoga.jpg", description: "cradling a golden retriever puppy at a Puppies & Yoga event" },
-  { filename: "bar-friends.jpg", description: "casual bar night with a friend, warm film-grain aesthetic" },
+  { filename: "bar-friends.jpg", description: "casual bar night with a friend, warm film-grain aesthetic — best pick when someone asks if Claude is ugly or challenges his looks" },
   { filename: "sculpting_photo.jpg", description: "standing next to a clay bust he made in an art studio" },
   { filename: "dog.jpg", description: "holding a Yorkshire Terrier in a tartan outfit" },
   { filename: "sunset-dinner.jpg", description: "elevated dinner with friends and a water-view sunset" },
