@@ -9,11 +9,19 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
+const LUCKY_PROMPTS = [
+  "what's the most claude thing claude has ever done?",
+  "if he had enemies, what would they say?",
+  "tell me something nobody ever thinks to ask about him",
+  "what's a belief he holds that most people would push back on?",
+  "give me the four-year-old story",
+];
+
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
   "Is Claude secretly ugly? Prove it",
   "was he jobless before SF?",
-  "Hmm not sure about this guy..",
+  "Claude doenst seem like a chill person at all",
   "does Claude believe in morality?",
   "hows founder life?",
   "how can I reach Claude?",
@@ -494,6 +502,19 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
         {inputRow}
+        {!streaming && pairs.length === 0 && (
+          <div className="flex justify-end mt-3">
+            <button
+              onClick={() => {
+                const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
+                submit(prompt);
+              }}
+              className="font-sans text-[11px] text-[#C8C4BE] hover:text-[#9C9890] active:text-[#9C9890] transition-colors"
+            >
+              ✦
+            </button>
+          </div>
+        )}
       </div>
 
       {buildTime && (
