@@ -384,6 +384,17 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       >
         →
       </button>
+      {!streaming && !input.trim() && (
+        <button
+          onClick={() => {
+            const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
+            submit(prompt);
+          }}
+          className="font-sans text-[13px] text-[#D8D4CF] hover:text-[#9C9890] active:text-[#9C9890] transition-colors shrink-0"
+        >
+          ✦
+        </button>
+      )}
     </div>
   );
 
@@ -502,19 +513,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
         {inputRow}
-        {!streaming && !input.trim() && (
-          <div className="flex justify-end mt-3">
-            <button
-              onClick={() => {
-                const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
-                submit(prompt);
-              }}
-              className="font-sans text-[11px] text-[#C8C4BE] hover:text-[#9C9890] active:text-[#9C9890] transition-colors"
-            >
-              ✦
-            </button>
-          </div>
-        )}
       </div>
 
       {buildTime && (
