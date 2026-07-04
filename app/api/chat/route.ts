@@ -152,8 +152,10 @@ toolResults.push({
             { role: "user", content: toolResults },
           ];
         }
-        // Persist conversation to Redis
-        if (sessionId) {
+        // Persist conversation to Redis (skip localhost)
+        const host = req.headers.get("host") ?? "";
+        const isLocal = host.startsWith("localhost") || host.startsWith("127.");
+        if (sessionId && !isLocal) {
           try {
             const toSave = lastAssistantText
               ? [...messages, { role: "assistant", content: lastAssistantText }]
