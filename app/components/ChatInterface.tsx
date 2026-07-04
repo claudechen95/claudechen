@@ -333,19 +333,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   const inputRow = (
     <div className="flex items-center gap-5">
-      <button
-        onClick={() => {
-          const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
-          submit(prompt);
-        }}
-        disabled={streaming || !!input.trim()}
-        className={[
-          "font-sans text-[13px] transition-colors shrink-0",
-          streaming || input.trim() ? "invisible" : "text-[#9C9890] hover:text-[#1B1B19] active:text-[#1B1B19]",
-        ].join(" ")}
-      >
-        ✦
-      </button>
       <div className="relative flex-1">
         {/* Shadow div — always in flow, mirrors textarea content to set height */}
         <div
@@ -511,9 +498,22 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       {/* Sticky input */}
       <div
         ref={inputBarRef}
-        className="shrink-0 w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 py-5"
+        className="relative shrink-0 w-full max-w-full md:max-w-[75vw] mx-auto px-6 md:px-10 py-5"
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
+        <button
+          onClick={() => {
+            const prompt = LUCKY_PROMPTS[Math.floor(Math.random() * LUCKY_PROMPTS.length)];
+            submit(prompt);
+          }}
+          disabled={streaming || !!input.trim()}
+          className={[
+            "absolute left-1 md:left-3 top-1/2 -translate-y-1/2 font-sans text-[11px] transition-colors",
+            streaming || input.trim() ? "invisible" : "text-[#9C9890] hover:text-[#1B1B19] active:text-[#1B1B19]",
+          ].join(" ")}
+        >
+          ✦
+        </button>
         {inputRow}
       </div>
 
