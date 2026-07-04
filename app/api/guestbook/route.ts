@@ -41,20 +41,19 @@ export async function POST(req: Request) {
   if (!name?.trim() || !message?.trim()) {
     return Response.json({ error: "Name and message required" }, { status: 400 });
   }
-  if (!file || file.size === 0) {
-    return Response.json({ error: "Photo required" }, { status: 400 });
+  let imageUrl: string | undefined;
+  if (file && file.size > 0) {
+    if (file.size > 5 * 1024 * 1024) {
+      return Response.json({ error: "Image too large (max 5MB)" }, { status: 400 });
+    }
+    const { buffer, filename, contentType } = await normalizeImage(file);
+    const blob = await put(`guestbook/${Date.now()}-${filename}`, buffer, {
+      access: "private",
+      contentType,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    imageUrl = `/api/guestbook/image?p=${encodeURIComponent(blob.url)}`;
   }
-  if (file.size > 5 * 1024 * 1024) {
-    return Response.json({ error: "Image too large (max 5MB)" }, { status: 400 });
-  }
-
-  const { buffer, filename, contentType } = await normalizeImage(file);
-  const blob = await put(`guestbook/${Date.now()}-${filename}`, buffer, {
-    access: "private",
-    contentType,
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-  });
-  const imageUrl = `/api/guestbook/image?p=${encodeURIComponent(blob.url)}`;
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? req.headers.get("x-real-ip") ?? undefined;
 
@@ -63,11 +62,18 @@ export async function POST(req: Request) {
     name: name.trim(),
     message: message.trim(),
     date: new Date().toISOString(),
-    imageUrl,
-    ip,
+    ...(imageUrl ? { imageUrl } : {}),
+    ...(ip ? { ip } : {}),
   };
 
   await kv.lpush("guestbook", entry);
+
+  fetch("https://ntfy.sh/claudechen-guestbook", {
+    method: "POST",
+    headers: { "Title": `${entry.name} signed the guestbook`, "Priority": "default" },
+    body: entry.message,
+  }).catch(() => {});
+
   return Response.json(entry, { status: 201 });
 }
 

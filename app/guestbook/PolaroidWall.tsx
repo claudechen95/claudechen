@@ -34,13 +34,13 @@ export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
   };
 
   const submit = async () => {
-    if (!photo || !message.trim() || !name.trim() || submitting) return;
+    if (!message.trim() || !name.trim() || submitting) return;
     setSubmitting(true);
     try {
       const fd = new FormData();
       fd.append("name", name.trim());
       fd.append("message", message.trim());
-      fd.append("image", photo);
+      if (photo) fd.append("image", photo);
       await fetch("/api/guestbook", { method: "POST", body: fd });
       onPosted();
     } finally {
@@ -48,28 +48,29 @@ export function NewEntryCard({ onPosted }: { onPosted: () => void }) {
     }
   };
 
-  const ready = !!photo && message.trim().length > 0 && name.trim().length > 0;
+  const ready = message.trim().length > 0 && name.trim().length > 0;
 
   return (
     <div className="bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)]">
       <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
       <div
         onClick={() => fileRef.current?.click()}
-        className="w-full aspect-[4/3] flex items-center justify-center cursor-pointer bg-[#8A8580]"
+        className="w-full flex items-center justify-center cursor-pointer bg-[#ECEAE6]"
+        style={{ height: preview ? "auto" : 80 }}
       >
         {preview ? (
-          <img src={preview} alt="" className="w-full h-full object-cover" />
+          <img src={preview} alt="" className="w-full h-auto block" />
         ) : (
-          <span className="font-sans text-white/40 text-3xl select-none">+</span>
+          <span className="font-sans text-[11px] text-[#9C9890] tracking-wide">+ photo (optional)</span>
         )}
       </div>
-      <div className="px-4 pt-3 pb-5">
+      <div className="px-4 pt-3 pb-4">
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="your message"
           rows={2}
-          className="font-sans text-[13px] text-[#2a2520] leading-relaxed w-full resize-none outline-none bg-transparent placeholder:text-[#C8C4BE] mb-4"
+          className="font-sans text-[13px] text-[#2a2520] leading-relaxed w-full resize-none outline-none bg-transparent placeholder:text-[#C8C4BE] mb-3"
         />
         <div className="flex items-center justify-between border-t border-[#F0EDE8] pt-3">
           <input

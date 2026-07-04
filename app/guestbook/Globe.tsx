@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Map, { Marker, useMap } from "react-map-gl/mapbox";
+
+const PIN_BOB_CSS = `
+@keyframes pin-bob {
+  0%, 100% { transform: rotate(-2deg) translateY(0px); }
+  50% { transform: rotate(-2deg) translateY(-5px); }
+}
+`;
 import type { GeoEntry } from "./page";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -50,7 +57,7 @@ function PolaroidOverlay({ entry, onClose }: { entry: GeoEntry; onClose: () => v
   );
 }
 
-function PolaroidPin({ entry, onClick }: { entry: GeoEntry; onClick: () => void }) {
+function PolaroidPin({ entry, onClick, delay = 0 }: { entry: GeoEntry; onClick: () => void; delay?: number }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -62,7 +69,8 @@ function PolaroidPin({ entry, onClick }: { entry: GeoEntry; onClick: () => void 
         cursor: "pointer",
         transformOrigin: "bottom center",
         transform: hovered ? "rotate(0deg) scale(1.15)" : "rotate(-2deg)",
-        transition: "transform 0.2s, box-shadow 0.2s",
+        transition: hovered ? "transform 0.2s, box-shadow 0.2s" : "transform 0.2s, box-shadow 0.2s",
+        animation: hovered ? "none" : `pin-bob 3s ease-in-out ${delay}s infinite`,
         background: "white",
         padding: "3px 3px 10px 3px",
         boxShadow: hovered
@@ -147,7 +155,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const canSubmit = !!name.trim() && !!message.trim() && !!photo && !submitting;
+  const canSubmit = !!name.trim() && !!message.trim() && !submitting;
 
   return (
     <div
@@ -168,7 +176,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="#1B1B19" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <circle cx="12" cy="13" r="4" stroke="#1B1B19" strokeWidth="1.5"/>
             </svg>
-            <span className="font-sans text-[11px] text-[#1B1B19]/40 tracking-wide uppercase">anything really</span>
+            <span className="font-sans text-[11px] text-[#1B1B19]/40 tracking-wide uppercase">optional photo</span>
           </>
         )}
       </div>
@@ -247,6 +255,7 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
 
   return (
     <>
+      <style>{PIN_BOB_CSS}</style>
       <div style={{ height: "100%", width: "100%" }}>
         <Map
           mapboxAccessToken={TOKEN}
@@ -267,14 +276,14 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
             "star-intensity": 0,
           }}
         >
-          {entries.map((entry) => (
+          {entries.map((entry, i) => (
             <Marker
               key={entry.id}
               longitude={entry.lng}
               latitude={entry.lat}
               anchor="bottom"
             >
-              <PolaroidPin entry={entry} onClick={() => handlePinClick(entry)} />
+              <PolaroidPin entry={entry} onClick={() => handlePinClick(entry)} delay={i * 0.4} />
             </Marker>
           ))}
 
