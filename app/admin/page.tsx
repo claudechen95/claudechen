@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { notFound } from "next/navigation";
+import GuestbookAdmin from "./GuestbookAdmin";
 
 const kv = new Redis({
   url: process.env.personalwebsite_KV_REST_API_URL!,
@@ -60,7 +61,10 @@ export default async function AdminPage({
   const { secret } = await searchParams;
   if (secret !== process.env.ADMIN_SECRET) return notFound();
 
-  const ids = (await kv.zrange<string[]>("conv_index", 0, -1)).reverse();
+  const [ids, guestbookEntries] = await Promise.all([
+    kv.zrange<string[]>("conv_index", 0, -1).then((r) => r.reverse()),
+    kv.lrange<{ id: string; name: string; message: string; date: string; imageUrl?: string; ip?: string }>("guestbook", 0, -1),
+  ]);
   const convs = (
     await Promise.all(ids.slice(0, 100).map((id) => kv.get<SavedConv>(`conv:${id}`)))
   ).filter(Boolean) as SavedConv[];
@@ -68,6 +72,13 @@ export default async function AdminPage({
   return (
     <div className="min-h-screen bg-[#F8F7F3] px-8 py-12">
       <div className="max-w-2xl mx-auto">
+        <p className="font-sans text-[13px] text-[#9C9890] mb-8">
+          guestbook — {guestbookEntries.length}
+        </p>
+        <div className="mb-20">
+          <GuestbookAdmin entries={guestbookEntries} secret={secret ?? ""} />
+        </div>
+
         <p className="font-sans text-[13px] text-[#9C9890] mb-16">
           conversations — {convs.length}
         </p>
