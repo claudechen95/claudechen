@@ -23,8 +23,12 @@ function parseUA(ua: string | null | undefined): string | null {
   if (!ua) return null;
   const browser = ua.includes("Edg/")
     ? "Edge"
+    : ua.includes("CriOS/")
+    ? "Chrome"
     : ua.includes("Chrome/")
     ? "Chrome"
+    : ua.includes("FxiOS/")
+    ? "Firefox"
     : ua.includes("Firefox/")
     ? "Firefox"
     : ua.includes("Safari/")
