@@ -140,12 +140,7 @@ function FlyToEntry({ entry, onDone }: { entry: GeoEntry; onDone: () => void }) 
 
   useEffect(() => {
     if (!map || !entry) return;
-    map.flyTo({
-      center: [entry.lng, entry.lat],
-      zoom: 9,
-      duration: 1400,
-      essential: true,
-    });
+    map.flyTo({ center: [entry.lng, entry.lat], zoom: 9, duration: 1400, essential: true });
     const timer = setTimeout(onDone, 1300);
     return () => clearTimeout(timer);
   }, [map, entry, onDone]);
@@ -153,13 +148,25 @@ function FlyToEntry({ entry, onDone }: { entry: GeoEntry; onDone: () => void }) 
   return null;
 }
 
-function EntryForm({ onClose }: { onClose: () => void }) {
+function FlyToCoords({ lat, lng, onDone }: { lat: number; lng: number; onDone: () => void }) {
+  const { current: map } = useMap();
+
+  useEffect(() => {
+    if (!map) return;
+    map.flyTo({ center: [lng, lat], zoom: 12, duration: 1800, essential: true });
+    const timer = setTimeout(onDone, 1800);
+    return () => clearTimeout(timer);
+  }, [map, lat, lng, onDone]);
+
+  return null;
+}
+
+function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (lat: number, lng: number) => void }) {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,7 +185,11 @@ function EntryForm({ onClose }: { onClose: () => void }) {
     fd.append("image", photo);
     try {
       const res = await fetch("/api/guestbook", { method: "POST", body: fd });
-      if (res.ok) setDone(true);
+      if (res.ok) {
+        const geo = await fetch("http://ip-api.com/json/?fields=status,lat,lon").then(r => r.json()).catch(() => null);
+        onClose();
+        if (geo?.status === "success") onPosted(geo.lat, geo.lon);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -193,7 +204,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
     >
       {/* Photo area */}
       <div
-        onClick={() => !done && fileRef.current?.click()}
+        onClick={() => fileRef.current?.click()}
         className="w-full flex flex-col items-center justify-center bg-[#D8D4CF] cursor-pointer relative overflow-y-auto"
         style={{ aspectRatio: preview ? undefined : "1 / 1", maxHeight: 320 }}
       >
@@ -213,21 +224,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
 
       {/* Caption strip */}
       <div className="mt-3">
-        {done ? (
-          <div className="flex items-end justify-between gap-2">
-            <div>
-              <p className="font-sans text-[14px] font-medium text-[#1B1B19]">{name}</p>
-              <p className="font-sans text-[12px] text-[#6B6760] leading-relaxed">{message}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="font-sans text-[11px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors shrink-0"
-            >
-              close ↗
-            </button>
-          </div>
-        ) : (
-          <>
+        <>
             <input
               type="text"
               placeholder="your name"
@@ -255,7 +252,6 @@ function EntryForm({ onClose }: { onClose: () => void }) {
               </button>
             </div>
           </>
-        )}
       </div>
     </div>
   );
@@ -264,6 +260,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
 export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
   const [selected, setSelected] = useState<GeoEntry | null>(null);
   const [flyTarget, setFlyTarget] = useState<GeoEntry | null>(null);
+  const [postFlyCoords, setPostFlyCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
 
@@ -321,6 +318,9 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
           {flyTarget && (
             <FlyToEntry entry={flyTarget} onDone={handleFlyDone} />
           )}
+          {postFlyCoords && (
+            <FlyToCoords lat={postFlyCoords.lat} lng={postFlyCoords.lng} onDone={() => setPostFlyCoords(null)} />
+          )}
         </Map>
       </div>
 
@@ -342,7 +342,10 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
         <div className="fixed inset-0 z-30 flex items-start justify-center p-8 overflow-y-auto">
           <div className="absolute inset-0" onClick={() => setFormOpen(false)} />
           <div className="relative w-full max-w-[340px] md:max-w-[360px] my-auto">
-            <EntryForm onClose={() => setFormOpen(false)} />
+            <EntryForm
+              onClose={() => setFormOpen(false)}
+              onPosted={(lat, lng) => setPostFlyCoords({ lat, lng })}
+            />
           </div>
         </div>
       )}
