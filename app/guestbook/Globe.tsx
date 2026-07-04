@@ -163,7 +163,7 @@ function FlyToCoords({ lat, lng, onDone }: { lat: number; lng: number; onDone: (
   return null;
 }
 
-function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (lat: number, lng: number) => void }) {
+function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (entry: GeoEntry) => void }) {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
@@ -188,9 +188,14 @@ function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (lat:
     try {
       const res = await fetch("/api/guestbook", { method: "POST", body: fd });
       if (res.ok) {
-        const geo = await fetch("http://ip-api.com/json/?fields=status,lat,lon").then(r => r.json()).catch(() => null);
+        const [entry, geo] = await Promise.all([
+          res.json(),
+          fetch("https://ip-api.com/json/?fields=status,lat,lon,city").then(r => r.json()).catch(() => null),
+        ]);
         onClose();
-        if (geo?.status === "success") onPosted(geo.lat, geo.lon);
+        if (geo?.status === "success") {
+          onPosted({ ...entry, lat: geo.lat, lng: geo.lon, city: geo.city ?? "" });
+        }
       }
     } finally {
       setSubmitting(false);
@@ -267,13 +272,16 @@ function fanOffsets(count: number, radius = 30): [number, number][] {
   });
 }
 
-export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
+export default function GlobeView({ entries: initialEntries }: { entries: GeoEntry[] }) {
   const router = useRouter();
+  const [entries, setEntries] = useState(initialEntries);
   const [selected, setSelected] = useState<GeoEntry | null>(null);
   const [flyTarget, setFlyTarget] = useState<GeoEntry | null>(null);
   const [postFlyCoords, setPostFlyCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+
+  useEffect(() => { setEntries(initialEntries); }, [initialEntries]);
 
   const entriesWithOffsets = useMemo(() => {
     const groups = new Map<string, GeoEntry[]>();
@@ -375,8 +383,9 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
           <div className="relative w-full max-w-[340px] md:max-w-[360px] my-auto">
             <EntryForm
               onClose={() => setFormOpen(false)}
-              onPosted={(lat, lng) => {
-                setPostFlyCoords({ lat, lng });
+              onPosted={(entry) => {
+                setEntries((prev) => [entry, ...prev]);
+                setPostFlyCoords({ lat: entry.lat, lng: entry.lng });
                 router.refresh();
               }}
             />
