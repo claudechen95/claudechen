@@ -193,7 +193,7 @@ function EntryForm({ onClose, onPosted }: { onClose: () => void; onPosted: (entr
         ]);
         onClose();
         if (geo?.status === "success") {
-          onPosted({ ...entry, lat: geo.lat, lng: geo.lon, city: geo.city ?? "" });
+          onPosted({ ...entry, lat: geo.lat, lng: geo.lng, city: geo.city ?? "" });
         }
       }
     } finally {
