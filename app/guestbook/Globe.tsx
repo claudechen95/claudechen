@@ -10,6 +10,35 @@ const PIN_BOB_CSS = `
 }
 `;
 import type { GeoEntry } from "./page";
+
+const LIMIT = 4 * 1024 * 1024; // 4MB, safely under Vercel's 4.5MB limit
+
+async function compressImage(file: File): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1200;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const tryQuality = (q: number) => {
+        canvas.toBlob((blob) => {
+          if (!blob) { resolve(file); return; }
+          if (blob.size <= LIMIT || q <= 0.3) {
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+          } else {
+            tryQuality(Math.round((q - 0.1) * 10) / 10);
+          }
+        }, "image/jpeg", q);
+      };
+      tryQuality(0.85);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
 import "mapbox-gl/dist/mapbox-gl.css";
 
 const TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -137,19 +166,7 @@ function EntryForm({ onClose }: { onClose: () => void }) {
     const f = e.target.files?.[0];
     if (!f) return;
     setPreview(URL.createObjectURL(f));
-    const img = new Image();
-    img.onload = () => {
-      const MAX = 1200;
-      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(img.width * scale);
-      canvas.height = Math.round(img.height * scale);
-      canvas.getContext("2d")!.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
-        if (blob) setPhoto(new File([blob], f.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
-      }, "image/jpeg", 0.85);
-    };
-    img.src = URL.createObjectURL(f);
+    compressImage(f).then(setPhoto);
   };
 
   const handleSubmit = async () => {
