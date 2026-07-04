@@ -21,7 +21,7 @@ function BackButtonInner() {
   return (
     <button
       onClick={handleBack}
-      className="font-sans text-[14px] text-[#C8C4BE] hover:text-[#9C9890] transition-colors"
+      className="font-sans text-[14px] text-white/70 hover:text-white transition-colors drop-shadow-sm"
     >
       ← back
     </button>

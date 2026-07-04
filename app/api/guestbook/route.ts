@@ -23,6 +23,7 @@ export interface Entry {
   message: string;
   date: string;
   imageUrl?: string;
+  ip?: string;
 }
 
 export async function GET() {
@@ -55,12 +56,15 @@ export async function POST(req: Request) {
   });
   const imageUrl = `/api/guestbook/image?p=${encodeURIComponent(blob.url)}`;
 
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? req.headers.get("x-real-ip") ?? undefined;
+
   const entry: Entry = {
     id: Math.random().toString(36).slice(2, 10),
     name: name.trim(),
     message: message.trim(),
     date: new Date().toISOString(),
     imageUrl,
+    ip,
   };
 
   await kv.lpush("guestbook", entry);
