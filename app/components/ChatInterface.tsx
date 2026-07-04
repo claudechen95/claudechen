@@ -502,7 +502,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         style={{ paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" }}
       >
         {inputRow}
-        {!streaming && pairs.length === 0 && (
+        {!streaming && !input.trim() && (
           <div className="flex justify-end mt-3">
             <button
               onClick={() => {
