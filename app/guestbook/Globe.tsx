@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Map, { Marker, useMap } from "react-map-gl/mapbox";
+import MapGL, { Marker, useMap } from "react-map-gl/mapbox";
 
 const PIN_BOB_CSS = `
 @keyframes pin-bob {
@@ -315,7 +315,7 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
     <>
       <style>{PIN_BOB_CSS}</style>
       <div style={{ height: "100%", width: "100%" }}>
-        <Map
+        <MapGL
           mapboxAccessToken={TOKEN}
           initialViewState={{
             longitude: -119,
@@ -352,7 +352,7 @@ export default function GlobeView({ entries }: { entries: GeoEntry[] }) {
           {postFlyCoords && (
             <FlyToCoords lat={postFlyCoords.lat} lng={postFlyCoords.lng} onDone={() => setPostFlyCoords(null)} />
           )}
-        </Map>
+        </MapGL>
       </div>
 
       {/* Floating add button */}
