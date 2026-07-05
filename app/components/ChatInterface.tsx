@@ -9,7 +9,7 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
-const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
+const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
@@ -91,7 +91,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const [photoModal, setPhotoModal] = useState<string | null>(null);
   const randomLuckyPos = () => ({ top: `${15 + Math.random() * 65}%`, left: `${6 + Math.random() * 82}%` });
-  const [luckyPos, setLuckyPos] = useState(randomLuckyPos);
+  const [luckyPos, setLuckyPos] = useState({ top: "40%", left: "15%" });
+  useEffect(() => { setLuckyPos(randomLuckyPos()); }, []);
   const [diceRolling, setDiceRolling] = useState(false);
   const [dicePoofing, setDicePoofing] = useState(false);
   const usedLuckyRef = useRef(new Set<string>());
