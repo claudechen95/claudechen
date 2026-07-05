@@ -9,7 +9,7 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
-const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "if he had enemies, what would they say?", "tell me something nobody ever thinks to ask about him", "give me the four-year-old story", "what does he actually do all day?", "what's his biggest red flag?", "what's he like at 2am?", "what would his mom say about him?", "give me his most embarrassing moment", "what keeps him up at night?", "what's his hot take on something?", "what kind of drunk is he?", "describe him in 3 words. go.", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
+const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what's his biggest red flag?", "what's he like at 2am?", "what would his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
@@ -513,13 +513,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           60% { opacity: 0.6; transform: scale(1) rotate(-8deg); }
         }
       `}</style>
-      {!streaming && (
+      {!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
         <button
           onClick={() => {
             const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
-            const pool = unused.length > 0 ? unused : LUCKY_PROMPTS;
-            if (unused.length === 0) usedLuckyRef.current.clear();
-            const prompt = pool[Math.floor(Math.random() * pool.length)];
+            if (unused.length === 0) return;
+            const prompt = unused[Math.floor(Math.random() * unused.length)];
             usedLuckyRef.current.add(prompt);
             submit(prompt);
             setLuckyPos(randomLuckyPos());
