@@ -427,6 +427,29 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           maxHeight: inputFocused ? "0px" : "50vh",
           transition: "max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
         }} />
+        {!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
+          <button
+            onClick={() => {
+              const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
+              if (unused.length === 0) return;
+              const prompt = unused[Math.floor(Math.random() * unused.length)];
+              usedLuckyRef.current.add(prompt);
+              submit(prompt);
+              setLuckyPos(randomLuckyPos());
+            }}
+            className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors pointer-events-auto"
+            style={{ top: luckyPos.top, left: luckyPos.left, animation: "star-shine 2.8s ease-in-out infinite" }}
+          >
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
+              <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+        )}
       </div>
     );
   }
