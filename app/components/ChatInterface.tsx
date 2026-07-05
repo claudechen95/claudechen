@@ -446,7 +446,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             style={{ top: luckyPos.top, left: luckyPos.left, animation: diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite" }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
+              <rect x="2" y="2" width="20" height="20" rx="4" ry="4" fill="#F8F7F3"/>
               <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
               <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
               <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
