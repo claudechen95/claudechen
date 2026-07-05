@@ -93,6 +93,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const randomLuckyPos = () => ({ top: `${15 + Math.random() * 65}%`, left: `${6 + Math.random() * 82}%` });
   const [luckyPos, setLuckyPos] = useState(randomLuckyPos);
   const [diceRolling, setDiceRolling] = useState(false);
+  const [dicePoofing, setDicePoofing] = useState(false);
   const usedLuckyRef = useRef(new Set<string>());
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -428,22 +429,28 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           maxHeight: inputFocused ? "0px" : "50vh",
           transition: "max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
         }} />
-        {!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
+        {!streaming && (LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) || dicePoofing) && (
           <button
             onClick={() => {
               const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
-              if (unused.length === 0 || diceRolling) return;
+              if (unused.length === 0 || diceRolling || dicePoofing) return;
+              const isLast = unused.length === 1;
               const prompt = unused[Math.floor(Math.random() * unused.length)];
               usedLuckyRef.current.add(prompt);
               setDiceRolling(true);
               setTimeout(() => {
                 setDiceRolling(false);
                 submit(prompt);
-                setLuckyPos(randomLuckyPos());
+                if (isLast) {
+                  setDicePoofing(true);
+                  setTimeout(() => setDicePoofing(false), 500);
+                } else {
+                  setLuckyPos(randomLuckyPos());
+                }
               }, 500);
             }}
             className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
-            style={{ top: luckyPos.top, left: luckyPos.left, animation: diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite" }}
+            style={{ top: luckyPos.top, left: luckyPos.left, animation: dicePoofing ? "dice-poof 0.5s ease-out forwards" : diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite" }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="4" ry="4" fill="#F8F7F3"/>
@@ -534,29 +541,35 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none z-20">{buildTime}</span>
       )}
 
-      {!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
+      {!streaming && (LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) || dicePoofing) && (
         <button
           onClick={() => {
             const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
-            if (unused.length === 0 || diceRolling) return;
+            if (unused.length === 0 || diceRolling || dicePoofing) return;
+            const isLast = unused.length === 1;
             const prompt = unused[Math.floor(Math.random() * unused.length)];
             usedLuckyRef.current.add(prompt);
             setDiceRolling(true);
             setTimeout(() => {
               setDiceRolling(false);
               submit(prompt);
-              setLuckyPos(randomLuckyPos());
+              if (isLast) {
+                setDicePoofing(true);
+                setTimeout(() => setDicePoofing(false), 500);
+              } else {
+                setLuckyPos(randomLuckyPos());
+              }
             }, 500);
           }}
           className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
           style={{
             top: luckyPos.top,
             left: luckyPos.left,
-            animation: diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite",
+            animation: dicePoofing ? "dice-poof 0.5s ease-out forwards" : diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite",
           }}
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
+            <rect x="2" y="2" width="20" height="20" rx="4" ry="4" fill="#F8F7F3"/>
             <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
             <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
             <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
