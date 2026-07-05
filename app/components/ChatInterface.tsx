@@ -430,12 +430,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           maxHeight: inputFocused ? "0px" : "50vh",
           transition: "max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
         }} />
-        {(dicePoofing || (!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)))) && (
+        {!streaming && !dicePoofing && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
           <button
-            key={dicePoofing ? "poof" : diceRolling ? "roll" : "idle"}
             onClick={() => {
               const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
-              if (unused.length === 0 || diceRolling || dicePoofing) return;
+              if (unused.length === 0 || diceRolling) return;
               const isLast = unused.length === 1;
               const prompt = unused[Math.floor(Math.random() * unused.length)];
               usedLuckyRef.current.add(prompt);
@@ -445,14 +444,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                 submit(prompt);
                 if (isLast) {
                   setDicePoofing(true);
-                  setTimeout(() => setDicePoofing(false), 500);
+                  setTimeout(() => setDicePoofing(false), 600);
                 } else {
                   setLuckyPos(randomLuckyPos());
                 }
               }, 500);
             }}
             className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
-            style={{ top: luckyPos.top, left: luckyPos.left, animation: dicePoofing ? "dice-poof 0.5s ease-out forwards" : diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite" }}
+            style={{ top: luckyPos.top, left: luckyPos.left, animation: diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite" }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="4" ry="4" fill="#F8F7F3"/>
@@ -463,6 +462,18 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
               <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
             </svg>
           </button>
+        )}
+        {dicePoofing && (
+          <div className="fixed z-10 text-[#6B6760] pointer-events-none" style={{ top: luckyPos.top, left: luckyPos.left, animation: "dice-poof 0.6s ease-out forwards" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="4" ry="4" fill="#F8F7F3"/>
+              <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+              <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
         )}
       </div>
     );
@@ -543,11 +554,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none z-20">{buildTime}</span>
       )}
 
-      {!streaming && (LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) || dicePoofing) && (
+      {!streaming && !dicePoofing && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
         <button
           onClick={() => {
             const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
-            if (unused.length === 0 || diceRolling || dicePoofing) return;
+            if (unused.length === 0 || diceRolling) return;
             const isLast = unused.length === 1;
             const prompt = unused[Math.floor(Math.random() * unused.length)];
             usedLuckyRef.current.add(prompt);
@@ -557,18 +568,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
               submit(prompt);
               if (isLast) {
                 setDicePoofing(true);
-                setTimeout(() => setDicePoofing(false), 500);
+                setTimeout(() => setDicePoofing(false), 600);
               } else {
                 setLuckyPos(randomLuckyPos());
               }
             }, 500);
           }}
           className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
-          style={{
-            top: luckyPos.top,
-            left: luckyPos.left,
-            animation: dicePoofing ? "dice-poof 0.5s ease-out forwards" : diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite",
-          }}
+          style={{ top: luckyPos.top, left: luckyPos.left, animation: diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite" }}
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="2" width="20" height="20" rx="4" ry="4" fill="#F8F7F3"/>
@@ -579,6 +586,18 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
           </svg>
         </button>
+      )}
+      {dicePoofing && (
+        <div className="fixed z-10 text-[#6B6760] pointer-events-none" style={{ top: luckyPos.top, left: luckyPos.left, animation: "dice-poof 0.6s ease-out forwards" }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="4" ry="4" fill="#F8F7F3"/>
+            <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
       )}
 
       {photoModal && (
