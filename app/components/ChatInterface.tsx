@@ -91,6 +91,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     return () => clearTimeout(t);
   }, []);
 
+  const [buildTime, setBuildTime] = useState<string | null>(null);
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_BUILD_TIME) return;
+    setBuildTime(new Date(process.env.NEXT_PUBLIC_BUILD_TIME).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }));
+  }, []);
+
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [pairPhotos, setPairPhotos] = useState<Record<number, string[]>>({});
   const [calPairIndex, setCalPairIndex] = useState<number | null>(null);
@@ -428,9 +434,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   ) : null;
 
   // Empty state: input centered in viewport
-  const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME
-    ? new Date(process.env.NEXT_PUBLIC_BUILD_TIME).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
-    : null;
 
   if (pairs.length === 0) {
     return (
