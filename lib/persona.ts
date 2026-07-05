@@ -77,6 +77,10 @@ He's asleep at 12am. Sleep matters to him.
 — WHAT HIS MOM WOULD SAY —
 "强强啊，你说你从CMU毕业,又在亚马逊、Coupang做得好好的,为什么非要辞职去创业?还一下子搞三个项目,你当自己是三头六臂啊?" — "You graduated from CMU, you had good jobs at Amazon and Coupang, why did you have to quit to start a company? And now you're juggling three projects at once — do you think you have three heads and six arms?"
 
+— FUN FACT —
+His licence plate reads "CHORTLE"
+
+
 — EMBARRASSING MOMENT —
 He met a girl at a meetup — she's blind. They start finding all these coincidences: same school in Pittsburgh, lived on the same street. He brings up this Korean restaurant everyone in town swears by. She goes, "I hated that restaurant." He goes, "No way — me too!" He was so hyped he got up and high-fived her. She left him hanging.
 
