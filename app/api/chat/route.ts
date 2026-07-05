@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   const region = req.headers.get("x-vercel-ip-country-region") ?? null;
   const ua = req.headers.get("user-agent") ?? null;
 
-  const { messages, visitorName, sessionId, shownPhotos } = await req.json();
+  const { messages, visitorName, sessionId, shownPhotos, isOwner } = await req.json();
 
   const shownSet = new Set<string>(Array.isArray(shownPhotos) ? shownPhotos : []);
   const availablePhotos = PHOTO_FILENAMES.filter((f) => !shownSet.has(f));
@@ -155,7 +155,7 @@ toolResults.push({
         // Persist conversation to Redis (skip localhost)
         const host = req.headers.get("host") ?? "";
         const isLocal = host.startsWith("localhost") || host.startsWith("127.");
-        if (sessionId && !isLocal) {
+        if (sessionId && !isLocal && !isOwner) {
           try {
             const toSave = lastAssistantText
               ? [...messages, { role: "assistant", content: lastAssistantText }]
