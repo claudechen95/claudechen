@@ -9,21 +9,16 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
-const LUCKY_PROMPTS = [
-  "what's the most claude thing claude has ever done?",
-  "if he had enemies, what would they say?",
-  "tell me something nobody ever thinks to ask about him",
-  "what's a belief he holds that most people would push back on?",
-  "give me the four-year-old story",
-];
+const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "if he had enemies, what would they say?", "tell me something nobody ever thinks to ask about him", "give me the four-year-old story", "what does he actually do all day?", "what's his biggest red flag?", "what's he like at 2am?", "what would his mom say about him?", "give me his most embarrassing moment", "what keeps him up at night?", "what's his hot take on something?", "what kind of drunk is he?", "describe him in 3 words. go.", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
   "Is Claude secretly ugly? Prove it",
+  "what's his biggest red flag?",
+  "what's he like at 2am?",
+  "describe him in 3 words. go.",
   "was he jobless before SF?",
   "Claude doenst seem like a chill person at all",
-  "does Claude believe in morality?",
-  "hows founder life?",
   "how can I reach Claude?",
   "Let's meet",
   "sign the guest book",
