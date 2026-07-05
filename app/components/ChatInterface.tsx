@@ -524,7 +524,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             submit(prompt);
             setLuckyPos(randomLuckyPos());
           }}
-          className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors text-[18px] pointer-events-auto"
+          className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors text-[28px] pointer-events-auto"
           style={{
             top: luckyPos.top,
             left: luckyPos.left,
