@@ -432,6 +432,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         }} />
         {(dicePoofing || (!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)))) && (
           <button
+            key={dicePoofing ? "poof" : diceRolling ? "roll" : "idle"}
             onClick={() => {
               const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
               if (unused.length === 0 || diceRolling || dicePoofing) return;
