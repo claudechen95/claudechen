@@ -430,7 +430,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           maxHeight: inputFocused ? "0px" : "50vh",
           transition: "max-height 0.32s cubic-bezier(0.4, 0, 0.2, 1)",
         }} />
-        {!streaming && (LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) || dicePoofing) && (
+        {(dicePoofing || (!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)))) && (
           <button
             onClick={() => {
               const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
