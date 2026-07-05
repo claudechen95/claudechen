@@ -455,24 +455,6 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             </svg>
           </button>
         )}
-        <style>{`
-          @keyframes dice-roll {
-            0%   { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
-            10%  { transform: rotate(-18deg) translateY(-3px); opacity: 0.9; }
-            20%  { transform: rotate(14deg) translateY(-6px); opacity: 1; }
-            30%  { transform: rotate(-10deg) translateY(-4px); opacity: 0.9; }
-            40%  { transform: rotate(6deg) translateY(-2px); opacity: 0.8; }
-            50%  { transform: rotate(-3deg) translateY(0px); opacity: 0.6; }
-            100% { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
-          }
-          @keyframes dice-click-roll {
-            0%   { transform: rotate(0deg) scale(1); opacity: 1; }
-            15%  { transform: rotate(-25deg) scale(0.85); opacity: 0.8; }
-            50%  { transform: rotate(390deg) scale(1.2); opacity: 1; }
-            75%  { transform: rotate(355deg) scale(1.05); opacity: 1; }
-            100% { transform: rotate(360deg) scale(1); opacity: 1; }
-          }
-        `}</style>
       </div>
     );
   }
