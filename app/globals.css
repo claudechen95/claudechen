@@ -17,6 +17,11 @@ body {
   animation-duration: 0s;
 }
 
+@keyframes intro-fade {
+  0%, 33% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @keyframes dice-roll {
   0%   { transform: rotate(0deg) translateY(0px); }
   10%  { transform: rotate(-18deg) translateY(-3px); }

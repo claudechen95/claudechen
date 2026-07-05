@@ -9,7 +9,7 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
-const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?"];
+const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
@@ -82,6 +82,13 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
+
+  const [introVisible, setIntroVisible] = useState(!initialSessionId);
+  useEffect(() => {
+    if (!introVisible) return;
+    const t = setTimeout(() => setIntroVisible(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
 
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [pairPhotos, setPairPhotos] = useState<Record<number, string[]>>({});
@@ -405,6 +412,20 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
     </Link>
   );
 
+  const introOverlay = introVisible ? (
+    <div
+      onClick={() => setIntroVisible(false)}
+      className="fixed inset-0 z-[100] cursor-pointer"
+      style={{ animation: "intro-fade 3s ease-in forwards" }}
+    >
+      <picture>
+        <source media="(min-aspect-ratio: 3/2)" srcSet="/intro-wide.gif" />
+        <source media="(min-aspect-ratio: 1/1)" srcSet="/intro-square.gif" />
+        <img src="/intro-mobile.gif" alt="" className="w-full h-full object-cover" />
+      </picture>
+    </div>
+  ) : null;
+
   // Empty state: input centered in viewport
   const buildTime = process.env.NEXT_PUBLIC_BUILD_TIME
     ? new Date(process.env.NEXT_PUBLIC_BUILD_TIME).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
@@ -475,6 +496,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             </svg>
           </div>
         )}
+        {introOverlay}
       </div>
     );
   }
@@ -613,6 +635,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           />
         </div>
       )}
+      {introOverlay}
     </div>
   );
 }
