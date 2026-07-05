@@ -437,8 +437,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
               submit(prompt);
               setLuckyPos(randomLuckyPos());
             }}
-            className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors pointer-events-auto"
-            style={{ top: luckyPos.top, left: luckyPos.left, animation: "star-shine 2.8s ease-in-out infinite" }}
+            className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
+            style={{ top: luckyPos.top, left: luckyPos.left, animation: "dice-roll 3.5s ease-in-out infinite" }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
@@ -450,6 +450,17 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             </svg>
           </button>
         )}
+        <style>{`
+          @keyframes dice-roll {
+            0%   { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
+            10%  { transform: rotate(-18deg) translateY(-3px); opacity: 0.9; }
+            20%  { transform: rotate(14deg) translateY(-6px); opacity: 1; }
+            30%  { transform: rotate(-10deg) translateY(-4px); opacity: 0.9; }
+            40%  { transform: rotate(6deg) translateY(-2px); opacity: 0.8; }
+            50%  { transform: rotate(-3deg) translateY(0px); opacity: 0.6; }
+            100% { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
+          }
+        `}</style>
       </div>
     );
   }
@@ -530,10 +541,14 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       )}
 
       <style>{`
-        @keyframes star-shine {
-          0%, 100% { opacity: 0.35; transform: scale(0.85) rotate(0deg); }
-          30% { opacity: 1; transform: scale(1.3) rotate(15deg); }
-          60% { opacity: 0.6; transform: scale(1) rotate(-8deg); }
+        @keyframes dice-roll {
+          0%   { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
+          10%  { transform: rotate(-18deg) translateY(-3px); opacity: 0.9; }
+          20%  { transform: rotate(14deg) translateY(-6px); opacity: 1; }
+          30%  { transform: rotate(-10deg) translateY(-4px); opacity: 0.9; }
+          40%  { transform: rotate(6deg) translateY(-2px); opacity: 0.8; }
+          50%  { transform: rotate(-3deg) translateY(0px); opacity: 0.6; }
+          100% { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
         }
       `}</style>
       {!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
@@ -546,11 +561,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             submit(prompt);
             setLuckyPos(randomLuckyPos());
           }}
-          className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors pointer-events-auto"
+          className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
           style={{
             top: luckyPos.top,
             left: luckyPos.left,
-            animation: "star-shine 2.8s ease-in-out infinite",
+            animation: "dice-roll 3.5s ease-in-out infinite",
           }}
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
