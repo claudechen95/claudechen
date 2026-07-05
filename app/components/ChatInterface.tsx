@@ -9,7 +9,7 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
-const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what's his biggest red flag?", "what's he like at 2am?", "what would his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
+const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what would his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
@@ -523,14 +523,21 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             submit(prompt);
             setLuckyPos(randomLuckyPos());
           }}
-          className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors text-[28px] pointer-events-auto"
+          className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] transition-colors pointer-events-auto"
           style={{
             top: luckyPos.top,
             left: luckyPos.left,
             animation: "star-shine 2.8s ease-in-out infinite",
           }}
         >
-          ✦
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
+            <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/>
+            <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+          </svg>
         </button>
       )}
 
