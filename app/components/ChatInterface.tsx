@@ -83,9 +83,10 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [streaming, setStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(initialSessionId ?? null);
 
-  const [introVisible, setIntroVisible] = useState(!initialSessionId);
+  const [introVisible, setIntroVisible] = useState(false);
   useEffect(() => {
-    if (!introVisible) return;
+    if (initialSessionId) return;
+    setIntroVisible(true);
     const t = setTimeout(() => setIntroVisible(false), 3000);
     return () => clearTimeout(t);
   }, []);
