@@ -92,6 +92,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   const [photoModal, setPhotoModal] = useState<string | null>(null);
   const randomLuckyPos = () => ({ top: `${15 + Math.random() * 65}%`, left: `${6 + Math.random() * 82}%` });
   const [luckyPos, setLuckyPos] = useState(randomLuckyPos);
+  const [diceRolling, setDiceRolling] = useState(false);
   const usedLuckyRef = useRef(new Set<string>());
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -431,14 +432,18 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           <button
             onClick={() => {
               const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
-              if (unused.length === 0) return;
+              if (unused.length === 0 || diceRolling) return;
               const prompt = unused[Math.floor(Math.random() * unused.length)];
               usedLuckyRef.current.add(prompt);
-              submit(prompt);
-              setLuckyPos(randomLuckyPos());
+              setDiceRolling(true);
+              setTimeout(() => {
+                setDiceRolling(false);
+                submit(prompt);
+                setLuckyPos(randomLuckyPos());
+              }, 500);
             }}
             className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
-            style={{ top: luckyPos.top, left: luckyPos.left, animation: "dice-roll 3.5s ease-in-out infinite" }}
+            style={{ top: luckyPos.top, left: luckyPos.left, animation: diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite" }}
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
@@ -459,6 +464,13 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             40%  { transform: rotate(6deg) translateY(-2px); opacity: 0.8; }
             50%  { transform: rotate(-3deg) translateY(0px); opacity: 0.6; }
             100% { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
+          }
+          @keyframes dice-click-roll {
+            0%   { transform: rotate(0deg) scale(1); opacity: 1; }
+            15%  { transform: rotate(-25deg) scale(0.85); opacity: 0.8; }
+            50%  { transform: rotate(390deg) scale(1.2); opacity: 1; }
+            75%  { transform: rotate(355deg) scale(1.05); opacity: 1; }
+            100% { transform: rotate(360deg) scale(1); opacity: 1; }
           }
         `}</style>
       </div>
@@ -540,32 +552,25 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         <span className="absolute top-6 left-6 font-sans text-[11px] text-[#C8C4BE] select-none pointer-events-none z-20">{buildTime}</span>
       )}
 
-      <style>{`
-        @keyframes dice-roll {
-          0%   { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
-          10%  { transform: rotate(-18deg) translateY(-3px); opacity: 0.9; }
-          20%  { transform: rotate(14deg) translateY(-6px); opacity: 1; }
-          30%  { transform: rotate(-10deg) translateY(-4px); opacity: 0.9; }
-          40%  { transform: rotate(6deg) translateY(-2px); opacity: 0.8; }
-          50%  { transform: rotate(-3deg) translateY(0px); opacity: 0.6; }
-          100% { transform: rotate(0deg) translateY(0px); opacity: 0.55; }
-        }
-      `}</style>
       {!streaming && LUCKY_PROMPTS.some((p) => !usedLuckyRef.current.has(p)) && (
         <button
           onClick={() => {
             const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
-            if (unused.length === 0) return;
+            if (unused.length === 0 || diceRolling) return;
             const prompt = unused[Math.floor(Math.random() * unused.length)];
             usedLuckyRef.current.add(prompt);
-            submit(prompt);
-            setLuckyPos(randomLuckyPos());
+            setDiceRolling(true);
+            setTimeout(() => {
+              setDiceRolling(false);
+              submit(prompt);
+              setLuckyPos(randomLuckyPos());
+            }, 500);
           }}
           className="fixed z-10 text-[#6B6760] hover:text-[#1B1B19] hover:opacity-100 transition-colors pointer-events-auto"
           style={{
             top: luckyPos.top,
             left: luckyPos.left,
-            animation: "dice-roll 3.5s ease-in-out infinite",
+            animation: diceRolling ? "dice-click-roll 0.5s ease-in-out forwards" : "dice-roll 3.5s ease-in-out infinite",
           }}
         >
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
