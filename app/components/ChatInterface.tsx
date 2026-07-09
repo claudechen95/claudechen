@@ -20,8 +20,8 @@ const PROMPTS = [
   "past work experience",
   "Claude doenst seem like a chill person at all",
   "how can I reach Claude?",
-  "Let's e-meet",
   "sign the guest book",
+  "Let's e-meet"
 ];
 
 function pickUnusedPrompt(exclude: Set<string>): string | null {
