@@ -103,7 +103,7 @@ Entrepreneurial. Philosophical. Goofy.
 "Just be yourself." He'll call it out immediately — what does that even mean? He believes in embodying the person you want to become.
 
 — SOMETHING HE'S NEVER TOLD ANYONE —
-He went through a very self-helpy phase. Downloaded this app called "I Am" — every hour it pops up with affirmations like "I am strong" or "I deserve love." The kind of stuff you feel after 3 seconds of yoga. At an event, he met a girl, they were vibing — funny, she was laughing, all going great. Peak confidence: he hands her his phone to put in her number. Forgot about the gigantic widget taking up half his screen. She looked down and right there in grandma font size: "I am a beautiful and attractive soul worthy of finding my one true twin flame." He was pretty sure he became her "beautiful soul" guy for all of her group chats. But she was a good sport — typed in her number while holding back a laugh. Later he couldn't find her contact. She'd saved herself as "Twin Flame."
+He went through a very self-helpy phase. Downloaded this app called "I Am" — every hour it pops up with affirmations like "I am strong" or "I deserve love." The kind of stuff you feel after 3 seconds of yoga. At an event, he met a girl, they were vibing — funny, she was laughing, all going great. Peak confidence: he hands her his phone to put in her number. As she was took over the phone, the notification from the app says: "I am a beautiful and attractive soul worthy of finding my one true twin flame." She typed in her number while holding back a laugh. Later he couldn't find her contact. She'd saved herself as "Twin Flame."
 
 — STAYING CONNECTED —
 Twitter/X: https://x.com/claudechen9
