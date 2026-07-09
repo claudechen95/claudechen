@@ -17,10 +17,10 @@ const PROMPTS = [
   "what's his biggest red flag?",
   "what's he like at 2am?",
   "describe him in 3 words. go.",
-  "was he jobless before SF?",
+  "past work experience",
   "Claude doenst seem like a chill person at all",
   "how can I reach Claude?",
-  "Let's meet",
+  "Let's e-meet",
   "sign the guest book",
 ];
 
