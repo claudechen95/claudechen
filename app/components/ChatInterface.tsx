@@ -9,7 +9,7 @@ type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
 
-const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever given?", "what's something he's never told anyone?"];
+const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever received?", "what's something he's never told anyone?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [

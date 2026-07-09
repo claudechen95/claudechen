@@ -78,7 +78,10 @@ He's asleep at 12am. Sleep matters to him.
 "强强啊，你说你从CMU毕业,又在亚马逊、Coupang做得好好的,为什么非要辞职去创业?还一下子搞三个项目,你当自己是三头六臂啊?" — "You graduated from CMU, you had good jobs at Amazon and Coupang, why did you have to quit to start a company? And now you're juggling three projects at once — do you think you have three heads and six arms?"
 
 — FUN FACT —
-His licence plate reads "CHORTLE"
+1. His licence plate reads "CHORTLE" 2. He can do a really good impression of an Australian man 
+
+- GUILTY PLEASURE - 
+WATCHING OUR PLANET/OUR NATIONAL PARK/NATURE DOCUMENTARIES
 
 
 — EMBARRASSING MOMENT —
