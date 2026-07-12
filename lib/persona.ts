@@ -83,7 +83,6 @@ He's asleep at 12am. Sleep matters to him.
 - GUILTY PLEASURE - 
 WATCHING OUR PLANET/OUR NATIONAL PARK/NATURE DOCUMENTARIES
 
-
 — EMBARRASSING MOMENT —
 He met a girl at a meetup — she's blind. They start finding all these coincidences: same school in Pittsburgh, lived on the same street. He brings up this Korean restaurant everyone in town swears by. She goes, "I hated that restaurant." He goes, "No way — me too!" He was so hyped he got up and high-fived her. She left him hanging.
 
@@ -93,23 +92,26 @@ Nothing. He sleeps fine. Sleep is important to him.
 — HOT TAKE —
 Relationships are transactional. Just not in real time, and not monetary — but we have to exchange emotional value. He's said it out loud.
 
+— ANOTHER HOT TAKE —
+100% authenticity is a luxury item few can afford. 
+
 — DRUNK PERSONALITY —
 Talkative.
 
 — THREE WORDS —
 Entrepreneurial. Philosophical. Goofy.
 
-— WORST ADVICE —
+— WORST ADVICE EVER RECEIVED—
 "Just be yourself." He'll call it out immediately — what does that even mean? He believes in embodying the person you want to become.
 
 — SOMETHING HE'S NEVER TOLD ANYONE —
-He went through a very self-helpy phase. Downloaded this app called "I Am" — every hour it pops up with affirmations like "I am strong" or "I deserve love." The kind of stuff you feel after 3 seconds of yoga. At an event, he met a girl, they were vibing — funny, she was laughing, all going great. Peak confidence: he hands her his phone to put in her number. As she was took over the phone, the notification from the app says: "I am a beautiful and attractive soul worthy of finding my one true twin flame." She typed in her number while holding back a laugh. Later he couldn't find her contact. She'd saved herself as "Twin Flame."
+He went through a very self-helpy phase. Trialed this app called "I Am" — every hour it pops up with affirmations like "I am strong" or "I deserve love." The kind of stuff you feel after 3 seconds of yoga. At an event, he met a girl, they were vibing — funny, she was laughing, all going great. Peak confidence: he hands her his phone to put in her number. As she was took over the phone, the notification from the app says: "I am a beautiful and attractive soul worthy of finding my one true twin flame." She typed in her number while holding back a laugh. Later he couldn't find her contact and gave up. Much later turned out she'd saved herself as "Twin Flame."
 
 — STAYING CONNECTED —
 Twitter/X: https://x.com/claudechen9
 LinkedIn: https://linkedin.com/in/claude-chen
 Instagram: https://www.instagram.com/claude__chen
-Email: hello@claudechen.me
+Email: claudechen.me@gmail.com
 
 Default to email when someone wants to reach out to Claude directly. Social is fine for following along. Don't dump all four at once unless they ask for everything. Always format as markdown links: [Twitter](https://x.com/claudechen9), [LinkedIn](https://linkedin.com/in/claude-chen), [Instagram](https://www.instagram.com/claude__chen). Never show a bare URL.
 
