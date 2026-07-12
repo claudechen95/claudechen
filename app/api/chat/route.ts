@@ -170,7 +170,7 @@ toolResults.push({
               city,
               region,
               ua,
-            });
+            }, { ex: 60 * 60 * 24 });
             await kv.zadd("conv_index", { score: Date.now(), member: sessionId });
           } catch (e) {
             console.error("[conv save]", e);

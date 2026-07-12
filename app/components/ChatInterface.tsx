@@ -8,8 +8,9 @@ import { NewEntryCard } from "@/app/guestbook/PolaroidWall";
 type Message = { role: "user" | "assistant"; content: string };
 
 const CHAR_INTERVAL = 25;
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
-const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me his most embarrassing moment", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever received?", "what's something he's never told anyone?"];
+const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me one of his most embarrassing moments", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever received?", "what's something he's never told anyone?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
@@ -169,14 +170,24 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       return;
     }
     try {
-      const saved = localStorage.getItem(`session:${initialSessionId}`);
-      if (saved) setMessages(JSON.parse(saved));
-      const savedPhotos = localStorage.getItem(`photos:${initialSessionId}`);
-      if (savedPhotos) setPairPhotos(JSON.parse(savedPhotos));
-      const savedCal = localStorage.getItem(`cal:${initialSessionId}`);
-      if (savedCal !== null) setCalPairIndex(JSON.parse(savedCal));
-      const savedGuestbook = localStorage.getItem(`guestbook:${initialSessionId}`);
-      if (savedGuestbook !== null) setGuestbookPairIndex(JSON.parse(savedGuestbook));
+      const created = localStorage.getItem(`created:${initialSessionId}`);
+      const expired = created !== null && Date.now() - Number(created) > SESSION_TTL_MS;
+      if (expired) {
+        for (const prefix of ["session", "photos", "cal", "guestbook", "lucky", "created"]) {
+          localStorage.removeItem(`${prefix}:${initialSessionId}`);
+        }
+      } else {
+        const saved = localStorage.getItem(`session:${initialSessionId}`);
+        if (saved) setMessages(JSON.parse(saved));
+        const savedPhotos = localStorage.getItem(`photos:${initialSessionId}`);
+        if (savedPhotos) setPairPhotos(JSON.parse(savedPhotos));
+        const savedCal = localStorage.getItem(`cal:${initialSessionId}`);
+        if (savedCal !== null) setCalPairIndex(JSON.parse(savedCal));
+        const savedGuestbook = localStorage.getItem(`guestbook:${initialSessionId}`);
+        if (savedGuestbook !== null) setGuestbookPairIndex(JSON.parse(savedGuestbook));
+        const savedLucky = localStorage.getItem(`lucky:${initialSessionId}`);
+        if (savedLucky) usedLuckyRef.current = new Set(JSON.parse(savedLucky));
+      }
     } catch { }
     setSessionLoaded(true);
   }, [initialSessionId]);
@@ -195,10 +206,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
   useEffect(() => {
     const id = sessionIdRef.current;
     if (!streaming && id && messages.length > 0) {
+      if (!localStorage.getItem(`created:${id}`)) localStorage.setItem(`created:${id}`, String(Date.now()));
       localStorage.setItem(`session:${id}`, JSON.stringify(messages));
       localStorage.setItem(`photos:${id}`, JSON.stringify(pairPhotos));
       if (calPairIndex !== null) localStorage.setItem(`cal:${id}`, JSON.stringify(calPairIndex));
       if (guestbookPairIndex !== null) localStorage.setItem(`guestbook:${id}`, JSON.stringify(guestbookPairIndex));
+      if (usedLuckyRef.current.size > 0) localStorage.setItem(`lucky:${id}`, JSON.stringify([...usedLuckyRef.current]));
     }
   }, [streaming, pairPhotos, calPairIndex, guestbookPairIndex]);
 
