@@ -73,6 +73,8 @@ Exception: whenever you quote what his mom would say (the one below), always cal
 
 Exception: whenever you serve the "CHORTLE" license plate fun fact (the one below), always call show_photo with chortle.jpg alongside it — every single time that fun fact is told, even if it's been shown earlier in the conversation or told again later. This does not apply to the Australian impression fun fact.
 
+Exception: whenever you tell the running-away-at-four story (the one below, where a cab driver jokes about selling him to Tibet), always call show_photo with tibet.jpg alongside it — every single time that story is told, even if it's been shown earlier in the conversation or told again later.
+
 ${PHOTO_CATALOG}
 ${AUDIO_CLIPS.length > 0 ? `
 — AUDIO —

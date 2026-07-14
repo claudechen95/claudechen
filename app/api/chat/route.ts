@@ -149,15 +149,23 @@ export async function POST(req: Request) {
             }
 
             if (block.name === "show_photo" && input.filename) {
-              controller.enqueue(
-                encoder.encode(`\x00PHOTO:${input.filename}\x00`)
-              );
+              if (availablePhotos.includes(input.filename)) {
+                controller.enqueue(
+                  encoder.encode(`\x00PHOTO:${input.filename}\x00`)
+                );
+              } else {
+                result = "that photo isn't available right now";
+              }
             }
 
             if (block.name === "show_audio" && input.filename) {
-              controller.enqueue(
-                encoder.encode(`\x00AUDIO:${input.filename}\x00`)
-              );
+              if (availableAudio.includes(input.filename)) {
+                controller.enqueue(
+                  encoder.encode(`\x00AUDIO:${input.filename}\x00`)
+                );
+              } else {
+                result = "that clip isn't available to play right now";
+              }
             }
 
             if (block.name === "update_visitor" && input.name) {

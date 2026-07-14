@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PHOTOS, PHOTO_FILENAMES, getAvailablePhotos } from "./photos";
 
-describe.each(["awk.jpg", "twinflame.jpg", "moms-words.jpg", "chortle.jpg"])("%s / repeatable story pairing", (filename) => {
+describe.each(["awk.jpg", "twinflame.jpg", "moms-words.jpg", "chortle.jpg", "tibet.jpg"])("%s / repeatable story pairing", (filename) => {
   it("is registered in the catalog", () => {
     expect(PHOTO_FILENAMES).toContain(filename);
   });

@@ -67,4 +67,13 @@ describe("embarrassing story photo pairing instruction", () => {
     expect(SYSTEM_PROMPT).toMatch(/do not call show_audio again, no matter what/i);
     expect(SYSTEM_PROMPT).toMatch(/one clip per ask/i);
   });
+
+  it("tells the model to always pair tibet.jpg with the running-away-at-four story", () => {
+    expect(SYSTEM_PROMPT).toMatch(/tibet\.jpg/);
+    expect(SYSTEM_PROMPT).toMatch(/always call show_photo with tibet\.jpg/i);
+  });
+
+  it("still contains the running-away-at-four / Tibet story itself", () => {
+    expect(SYSTEM_PROMPT).toMatch(/sell him to Tibet/i);
+  });
 });

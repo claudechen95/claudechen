@@ -11,6 +11,7 @@ export const PHOTOS: Photo[] = [
   { filename: "twinflame.jpg", description: "cringe/awkward reaction shot. Always show this alongside the 'Twin Flame' self-helpy-app embarrassing story — never any other photo for that story" },
   { filename: "moms-words.jpg", description: "reaction shot paired with what his mom would say. Always show this alongside the 'what his mom would say' quote — never any other photo for that quote" },
   { filename: "chortle.jpg", description: "photo of the CHORTLE license plate fun fact. Always show this alongside that specific fun fact — never any other photo for it" },
+  { filename: "tibet.jpg", description: "reaction shot paired with the running-away-at-four story. Always show this alongside the story where the cab driver joked about selling him to Tibet — never any other photo for that story" },
   { filename: "sculpting_photo.jpg", description: "standing next to a clay bust he made in an art studio" },
   { filename: "dog.jpg", description: "holding a Yorkshire Terrier in a tartan outfit" },
   { filename: "sunset-dinner.jpg", description: "elevated dinner with friends and a water-view sunset" },
@@ -71,7 +72,7 @@ export const PHOTO_FILENAMES = PHOTOS.map((p) => p.filename);
 
 // Photos allowed to be shown again even if already shown earlier in the session —
 // e.g. awk.jpg is paired to a specific story and should reappear every time that story is retold.
-export const REPEATABLE_PHOTOS = new Set(["awk.jpg", "twinflame.jpg", "moms-words.jpg", "chortle.jpg"]);
+export const REPEATABLE_PHOTOS = new Set(["awk.jpg", "twinflame.jpg", "moms-words.jpg", "chortle.jpg", "tibet.jpg"]);
 
 export function getAvailablePhotos(shownPhotos: string[]): string[] {
   const shownSet = new Set(shownPhotos);
