@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { Redis } from "@upstash/redis";
 import { SYSTEM_PROMPT } from "@/lib/persona";
 import { getAvailablePhotos } from "@/lib/photos";
+import { getAvailableAudio } from "@/lib/audio";
 
 const client = new Anthropic();
 const kv = new Redis({
@@ -9,7 +10,7 @@ const kv = new Redis({
   token: process.env.personalwebsite_KV_REST_API_TOKEN!,
 });
 
-function buildTools(availablePhotos: string[]): Anthropic.Tool[] {
+function buildTools(availablePhotos: string[], availableAudio: string[]): Anthropic.Tool[] {
   return [
   {
     name: "show_guestbook",
@@ -51,6 +52,26 @@ function buildTools(availablePhotos: string[]): Anthropic.Tool[] {
       required: ["name"],
     },
   },
+  ...(availableAudio.length > 0
+    ? [
+        {
+          name: "show_audio",
+          description:
+            "Play an audio clip of Claude inline in the conversation, with a click-to-play control. Use when a visitor asks to hear his voice, an impression, or anything an audio clip answers better than words.",
+          input_schema: {
+            type: "object" as const,
+            properties: {
+              filename: {
+                type: "string",
+                description: "The audio filename from the catalog in the system prompt",
+                enum: availableAudio,
+              },
+            },
+            required: ["filename"],
+          },
+        },
+      ]
+    : []),
   ];
 }
 
@@ -64,9 +85,10 @@ export async function POST(req: Request) {
   const region = req.headers.get("x-vercel-ip-country-region") ?? null;
   const ua = req.headers.get("user-agent") ?? null;
 
-  const { messages, visitorName, sessionId, shownPhotos, isOwner } = await req.json();
+  const { messages, visitorName, sessionId, shownPhotos, playedAudio, isOwner } = await req.json();
 
   const availablePhotos = getAvailablePhotos(Array.isArray(shownPhotos) ? shownPhotos : []);
+  const availableAudio = getAvailableAudio(Array.isArray(playedAudio) ? playedAudio : []);
 
   const system = visitorName
     ? `${SYSTEM_PROMPT}\n\n— RETURNING VISITOR —\nThis visitor's name is ${visitorName}. Use it naturally.`
@@ -86,7 +108,7 @@ export async function POST(req: Request) {
             model: "claude-sonnet-4-6",
             max_tokens: 1024,
             system,
-            tools: buildTools(availablePhotos),
+            tools: buildTools(availablePhotos, availableAudio),
             messages: currentMessages,
           });
 
@@ -129,6 +151,12 @@ export async function POST(req: Request) {
             if (block.name === "show_photo" && input.filename) {
               controller.enqueue(
                 encoder.encode(`\x00PHOTO:${input.filename}\x00`)
+              );
+            }
+
+            if (block.name === "show_audio" && input.filename) {
+              controller.enqueue(
+                encoder.encode(`\x00AUDIO:${input.filename}\x00`)
               );
             }
 

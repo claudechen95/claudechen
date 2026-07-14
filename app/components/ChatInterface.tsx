@@ -10,11 +10,10 @@ type Message = { role: "user" | "assistant"; content: string };
 const CHAR_INTERVAL = 25;
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
-const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me one of his most embarrassing moments", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever received?", "what's something he's never told anyone?"];
+const LUCKY_PROMPTS = ["Give me his fun facts", "what's the most claude thing claude has ever done?", "what did his mom say about him?", "give me one of his most embarrassing moments", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever received?", "what's something he's never told anyone?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
-  "Give me his fun facts",
   "Is Claude secretly ugly? Prove it",
   "what's his biggest red flag?",
   "what's he like at 2am?",
@@ -101,6 +100,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
 
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [pairPhotos, setPairPhotos] = useState<Record<number, string[]>>({});
+  const [pairAudio, setPairAudio] = useState<Record<number, string[]>>({});
   const [calPairIndex, setCalPairIndex] = useState<number | null>(null);
   const [guestbookPairIndex, setGuestbookPairIndex] = useState<number | null>(null);
   const [suggestedPrompt, setSuggestedPrompt] = useState<string | null>(null);
@@ -174,7 +174,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       const created = localStorage.getItem(`created:${initialSessionId}`);
       const expired = created !== null && Date.now() - Number(created) > SESSION_TTL_MS;
       if (expired) {
-        for (const prefix of ["session", "photos", "cal", "guestbook", "lucky", "created"]) {
+        for (const prefix of ["session", "photos", "audio", "cal", "guestbook", "lucky", "created"]) {
           localStorage.removeItem(`${prefix}:${initialSessionId}`);
         }
       } else {
@@ -182,6 +182,8 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
         if (saved) setMessages(JSON.parse(saved));
         const savedPhotos = localStorage.getItem(`photos:${initialSessionId}`);
         if (savedPhotos) setPairPhotos(JSON.parse(savedPhotos));
+        const savedAudio = localStorage.getItem(`audio:${initialSessionId}`);
+        if (savedAudio) setPairAudio(JSON.parse(savedAudio));
         const savedCal = localStorage.getItem(`cal:${initialSessionId}`);
         if (savedCal !== null) setCalPairIndex(JSON.parse(savedCal));
         const savedGuestbook = localStorage.getItem(`guestbook:${initialSessionId}`);
@@ -210,17 +212,18 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       if (!localStorage.getItem(`created:${id}`)) localStorage.setItem(`created:${id}`, String(Date.now()));
       localStorage.setItem(`session:${id}`, JSON.stringify(messages));
       localStorage.setItem(`photos:${id}`, JSON.stringify(pairPhotos));
+      localStorage.setItem(`audio:${id}`, JSON.stringify(pairAudio));
       if (calPairIndex !== null) localStorage.setItem(`cal:${id}`, JSON.stringify(calPairIndex));
       if (guestbookPairIndex !== null) localStorage.setItem(`guestbook:${id}`, JSON.stringify(guestbookPairIndex));
       if (usedLuckyRef.current.size > 0) localStorage.setItem(`lucky:${id}`, JSON.stringify([...usedLuckyRef.current]));
     }
-  }, [streaming, pairPhotos, calPairIndex, guestbookPairIndex]);
+  }, [streaming, pairPhotos, pairAudio, calPairIndex, guestbookPairIndex]);
 
   // Scroll conversation to bottom on update
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, pairPhotos]);
+  }, [messages, pairPhotos, pairAudio]);
 
   const submit = async (text: string) => {
     const q = text.trim();
@@ -265,10 +268,11 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
       posthog?.capture("question_asked", { question: q });
 
       const shownPhotos = Object.values(pairPhotos).flat().map((url) => url.replace("/api/photos/", ""));
+      const playedAudio = Object.values(pairAudio).flat().map((url) => url.replace("/api/audio/", ""));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history, visitorName: sessionIdRef.current ? visitorName : null, sessionId: currentSessionId, shownPhotos, isOwner: localStorage.getItem("__owner__") === "1" }),
+        body: JSON.stringify({ messages: history, visitorName: sessionIdRef.current ? visitorName : null, sessionId: currentSessionId, shownPhotos, playedAudio, isOwner: localStorage.getItem("__owner__") === "1" }),
       });
 
       if (!res.ok || !res.body) throw new Error();
@@ -295,6 +299,12 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           setPairPhotos((prev) => ({ ...prev, [pairIndex]: [...(prev[pairIndex] ?? []), ...newUrls] }));
           chunk = chunk.replace(/\x00PHOTO:[^\x00]+\x00/g, " ");
         }
+        const audioMatches = [...chunk.matchAll(/\x00AUDIO:([^\x00]+)\x00/g)];
+        if (audioMatches.length > 0) {
+          const newUrls = audioMatches.map((m) => `/api/audio/${m[1]}`);
+          setPairAudio((prev) => ({ ...prev, [pairIndex]: [...(prev[pairIndex] ?? []), ...newUrls] }));
+          chunk = chunk.replace(/\x00AUDIO:[^\x00]+\x00/g, " ");
+        }
         const visitorMatch = chunk.match(/\x00VISITOR:([^\x00]+)\x00/);
         if (visitorMatch) {
           const name = visitorMatch[1];
@@ -302,6 +312,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
           chunk = chunk.replace(visitorMatch[0], "");
         }
         chunk = chunk.replace(/PHOTO:[a-zA-Z0-9_\-\.]+/g, " ");
+        chunk = chunk.replace(/AUDIO:[a-zA-Z0-9_\-\.]+/g, " ");
         for (const ch of chunk) { revealQueueRef.current.push(ch); }
       }
     } catch {
@@ -544,6 +555,13 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
                             onLoad={() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }}
                           />
                         </button>
+                      ))}
+                    </div>
+                  )}
+                  {pairAudio[i]?.length > 0 && (
+                    <div className="flex flex-col gap-2 mb-6">
+                      {pairAudio[i].map((url, j) => (
+                        <audio key={j} controls src={url} className="max-w-full h-10" />
                       ))}
                     </div>
                   )}

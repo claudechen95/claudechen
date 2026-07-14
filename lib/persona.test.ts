@@ -37,4 +37,17 @@ describe("embarrassing story photo pairing instruction", () => {
   it("still contains the CHORTLE license plate fun fact itself", () => {
     expect(SYSTEM_PROMPT).toMatch(/licence plate reads "CHORTLE"/i);
   });
+
+  it("tells the model to always play impression.m4a with the Australian impression fun fact", () => {
+    expect(SYSTEM_PROMPT).toMatch(/impression\.m4a/);
+    expect(SYSTEM_PROMPT).toMatch(/always call show_audio with impression\.m4a/i);
+  });
+
+  it("still contains the Australian impression fun fact itself", () => {
+    expect(SYSTEM_PROMPT).toMatch(/impression of an Australian man/i);
+  });
+
+  it("tells the model to breadcrumb the other fun fact when only one is told", () => {
+    expect(SYSTEM_PROMPT).toMatch(/tell only one of these.*breadcrumb that there's another/i);
+  });
 });
