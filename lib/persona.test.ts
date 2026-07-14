@@ -50,4 +50,16 @@ describe("embarrassing story photo pairing instruction", () => {
   it("tells the model to breadcrumb the other fun fact when only one is told", () => {
     expect(SYSTEM_PROMPT).toMatch(/tell only one of these.*breadcrumb that there's another/i);
   });
+
+  it("tells the model to challenge with a guestbook bet before revealing the Australian impression fact", () => {
+    expect(SYSTEM_PROMPT).toMatch(/bet them that if they laugh, they have to sign the guestbook/i);
+  });
+
+  it("tells the model not to reveal the fact at all if they decline the bet", () => {
+    expect(SYSTEM_PROMPT).toMatch(/if they decline or disagree, drop it.*don't reveal fun fact #2 at all/i);
+  });
+
+  it("tells the model to call show_guestbook if they laugh after the reveal", () => {
+    expect(SYSTEM_PROMPT).toMatch(/if their reaction afterward reads like they're laughing or amused, call show_guestbook/i);
+  });
 });
