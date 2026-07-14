@@ -14,6 +14,7 @@ const LUCKY_PROMPTS = ["what's the most claude thing claude has ever done?", "wh
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
+  "Give me his fun facts",
   "Is Claude secretly ugly? Prove it",
   "what's his biggest red flag?",
   "what's he like at 2am?",

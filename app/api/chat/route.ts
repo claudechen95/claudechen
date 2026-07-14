@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Redis } from "@upstash/redis";
 import { SYSTEM_PROMPT } from "@/lib/persona";
-import { PHOTO_FILENAMES } from "@/lib/photos";
+import { getAvailablePhotos } from "@/lib/photos";
 
 const client = new Anthropic();
 const kv = new Redis({
@@ -66,8 +66,7 @@ export async function POST(req: Request) {
 
   const { messages, visitorName, sessionId, shownPhotos, isOwner } = await req.json();
 
-  const shownSet = new Set<string>(Array.isArray(shownPhotos) ? shownPhotos : []);
-  const availablePhotos = PHOTO_FILENAMES.filter((f) => !shownSet.has(f));
+  const availablePhotos = getAvailablePhotos(Array.isArray(shownPhotos) ? shownPhotos : []);
 
   const system = visitorName
     ? `${SYSTEM_PROMPT}\n\n— RETURNING VISITOR —\nThis visitor's name is ${visitorName}. Use it naturally.`
