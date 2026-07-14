@@ -1,17 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { AUDIO_CLIPS, AUDIO_FILENAMES, REPEATABLE_AUDIO, getAvailableAudio } from "./audio";
 
-describe.each(["impression.m4a"])("%s / repeatable clip pairing", (filename) => {
+describe("impression.m4a / one-time guestbook-bet clip", () => {
   it("is registered in the catalog", () => {
-    expect(AUDIO_FILENAMES).toContain(filename);
+    expect(AUDIO_FILENAMES).toContain("impression.m4a");
   });
 
   it("stays available on the first offer", () => {
-    expect(getAvailableAudio([])).toContain(filename);
+    expect(getAvailableAudio([])).toContain("impression.m4a");
   });
 
-  it("stays available even after already being played this session", () => {
-    expect(getAvailableAudio([filename])).toContain(filename);
+  it("is hard-excluded once already played this session, so it can never replay mid-negotiation", () => {
+    expect(getAvailableAudio(["impression.m4a"])).not.toContain("impression.m4a");
   });
 });
 

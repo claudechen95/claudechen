@@ -38,9 +38,9 @@ describe("embarrassing story photo pairing instruction", () => {
     expect(SYSTEM_PROMPT).toMatch(/licence plate reads "CHORTLE"/i);
   });
 
-  it("tells the model to always play impression.m4a with the Australian impression fun fact", () => {
+  it("tells the model to play impression.m4a once on the Australian impression reveal turn", () => {
     expect(SYSTEM_PROMPT).toMatch(/impression\.m4a/);
-    expect(SYSTEM_PROMPT).toMatch(/always call show_audio with impression\.m4a/i);
+    expect(SYSTEM_PROMPT).toMatch(/call show_audio with impression\.m4a exactly once/i);
   });
 
   it("still contains the Australian impression fun fact itself", () => {
@@ -61,5 +61,10 @@ describe("embarrassing story photo pairing instruction", () => {
 
   it("tells the model to call show_guestbook if they laugh after the reveal", () => {
     expect(SYSTEM_PROMPT).toMatch(/if their reaction afterward reads like they're laughing or amused, call show_guestbook/i);
+  });
+
+  it("tells the model not to replay impression.m4a on later nagging/reaction turns", () => {
+    expect(SYSTEM_PROMPT).toMatch(/do not call show_audio again, no matter what/i);
+    expect(SYSTEM_PROMPT).toMatch(/one clip per ask/i);
   });
 });

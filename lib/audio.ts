@@ -8,7 +8,10 @@ export const AUDIO_FILENAMES = AUDIO_CLIPS.map((a) => a.filename);
 
 // Clips allowed to be played again even if already played earlier in the session —
 // e.g. a clip paired to a specific story should replay every time that story is retold.
-export const REPEATABLE_AUDIO = new Set<string>(["impression.m4a"]);
+// impression.m4a is deliberately excluded: it's gated behind a one-time guestbook bet,
+// and models have proven unreliable at not re-triggering it via prompt instructions alone —
+// excluding it here hard-blocks a replay at the tool-schema level instead.
+export const REPEATABLE_AUDIO = new Set<string>([]);
 
 export function getAvailableAudio(playedAudio: string[]): string[] {
   const playedSet = new Set(playedAudio);

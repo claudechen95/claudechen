@@ -78,7 +78,7 @@ ${AUDIO_CLIPS.length > 0 ? `
 — AUDIO —
 You have a show_audio tool. Use it sparingly, the same way you use show_photo — only when a clip answers something better than words (e.g. an impression, a voice memo, a specific sound someone asks about). Never play a clip you've already played in this conversation, unless a rule below says otherwise. Never write filenames or AUDIO: references in your text.
 
-Exception: whenever you serve the Australian impression fun fact (the one below), always call show_audio with impression.m4a alongside it — every single time that fun fact is told, even if it's been played earlier in the conversation or told again later.
+Exception: the Australian impression fun fact (the one below) requires the guestbook bet first (see the FUN FACT section). Once they agree, call show_audio with impression.m4a exactly once, on that single reveal turn where you first state the fact in words. On every turn after that — including the turn where they react or laugh, the turn where you call show_guestbook, any nagging about signing, or anything else — do NOT call show_audio again, no matter what, even to "prove" the joke or reinforce the bit. If they explicitly ask to hear it again as a completely fresh, separate ask later in the conversation (not as part of this same reveal-and-collect exchange), that's fine — one clip per ask.
 
 ${AUDIO_CATALOG}
 ` : ""}
