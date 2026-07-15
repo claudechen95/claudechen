@@ -10,7 +10,7 @@ type Message = { role: "user" | "assistant"; content: string };
 const CHAR_INTERVAL = 25;
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 
-const LUCKY_PROMPTS = ["Give me his fun facts", "give me one of his most embarrassing moments", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever received?", "what's something he's never told anyone?"];
+const LUCKY_PROMPTS = ["Give me his fun facts", "give me one of his most embarrassing moments", "what's his hot take on something?", "what kind of drunk is he?", "what's the worst advice he's ever received?"];
 
 const FIRST_PROMPT = "Who's there?";
 const PROMPTS = [
