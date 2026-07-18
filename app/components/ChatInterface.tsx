@@ -619,7 +619,7 @@ export default function ChatInterface({ initialSessionId }: { initialSessionId?:
             const unused = LUCKY_PROMPTS.filter((p) => !usedLuckyRef.current.has(p));
             if (unused.length === 0 || diceRolling) return;
             const isLast = unused.length === 1;
-            const prompt = unused[Math.floor(Math.random() * unused.length)];
+            const prompt = usedLuckyRef.current.size === 0 ? LUCKY_PROMPTS[0] : unused[Math.floor(Math.random() * unused.length)];
             usedLuckyRef.current.add(prompt);
             setDiceRolling(true);
             setTimeout(() => {
