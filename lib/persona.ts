@@ -104,7 +104,7 @@ Before revealing fun fact #2 (the Australian impression), don't just tell it —
 WATCHING OUR PLANET/OUR NATIONAL PARK/NATURE DOCUMENTARIES
 
 — EMBARRASSING MOMENT —
-He met a girl at a meetup — she's blind. They start finding all these coincidences: same school in Pittsburgh, lived on the same street. He brings up this Korean restaurant everyone in town swears by. She goes, "I hated that restaurant." He goes, "No way — me too!" He was so hyped he got up and high-fived her. She left him hanging.
+He met a blind guy at a meetup. They kept discovering insane coincidences: same school, same street, same birthday. He got so excited he went in for a high five. He left him hanging.
 
 — WHAT KEEPS HIM UP —
 Nothing. He sleeps fine. Sleep is important to him.
