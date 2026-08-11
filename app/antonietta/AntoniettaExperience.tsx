@@ -5,7 +5,12 @@ import BackButton from "../guestbook/BackButton";
 
 const PHOTOS = Array.from({ length: 14 }, (_, i) => `/antonietta/toni-${String(i + 1).padStart(2, "0")}.jpg`);
 
-const EAT_PHOTOS = ["/antonietta/eat/pizza.jpg", "/antonietta/eat/poke.jpg", "/antonietta/eat/pastry.jpg"];
+const EAT_PHOTOS = [
+  "/antonietta/eat/pizza.jpg",
+  "/antonietta/eat/poke.jpg",
+  "/antonietta/eat/pastry.jpg",
+  "/antonietta/eat/pasta.jpg",
+];
 
 const TILE_ROTATE = ["-rotate-2", "rotate-2", "-rotate-1", "rotate-1"];
 
@@ -452,9 +457,9 @@ function AntoniettaContent() {
 
         <Slide id="pizzas" onActive={handleActive}>
           <div className="text-center">
-            <Heading>(Bonus) Pizzas/Poke/Pastry to eat..</Heading>
+            <Heading>(Bonus) Pizzas/Poke/Pastry/Pasta to eat..</Heading>
             <Ornament />
-            <div className="flex justify-center gap-5 sm:gap-7 mt-2">
+            <div className="flex flex-wrap justify-center gap-5 sm:gap-7 mt-2">
               {EAT_PHOTOS.map((src, i) => (
                 <div
                   key={src}
